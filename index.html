@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mzansi Taps - South African Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        :root {
+            --sa-blue: #002395;
+            --sa-green: #007749;
+            --sa-yellow: #ffb81c;
+            --sa-red: #de3831;
+            --gold: #ffd700;
+            --orange: #ff8c00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /*
+         * Set up the root document and body to consume the full viewport height and
+         * hide any page-level scrollbars.  This ensures that only specific
+         * containers (such as the sidebar) can scroll vertically if needed and
+         * prevents the browser from showing a global scroll bar down the right
+         * side of the page.  Assigning 100% height to both elements allows
+         * descendant flex containers to size themselves relative to the full
+         * viewport without overflowing.
+         */
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        body {
+            background: linear-gradient(135deg,
+                rgba(0, 35, 149, 0.8),
+                rgba(0, 119, 73, 0.8),
+                rgba(255, 184, 28, 0.8),
+                rgba(222, 56, 49, 0.8)
+            );
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* provide a gap around the game container without causing overflow */
+            padding: 20px;
+        }
+
+        /* Sign‑up overlay */
+        .signup-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+        .signup-box {
+            background: linear-gradient(135deg, var(--sa-blue), var(--sa-green));
+            border-radius: 16px;
+            padding: 30px;
+            width: 90%;
+            max-width: 420px;
+            text-align: center;
+            border: 3px solid var(--gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+        .signup-box h2 {
+            color: var(--gold);
+            margin-bottom: 8px;
+            font-size: 1.7rem;
+        }
+        .signup-box p {
+            color: var(--gold);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        .signup-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .form-group {
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 2px solid var(--gold);
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            font-size: 1rem;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #ff4500;
+            box-shadow: 0 0 10px rgba(255, 69, 0, 0.5);
+        }
+        .signup-form button {
+            margin-top: 10px;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(to bottom, var(--gold), var(--orange));
+            color: #000;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .signup-form button:hover {
+            background: linear-gradient(to bottom, #ffc400, #ff7700);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.6);
+        }
+
+        /* Game container */
+        .game-container {
+            width: 100%;
+            max-width: 1100px;
+            /* Fix the container height to fit within the viewport. */
+            height: 95vh;
+            max-height: 95vh;
+            min-height: 600px;
+            background: rgba(0, 0, 0, 0.85);
+            border-radius: 18px;
+            border: 4px solid var(--gold);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: auto 1fr auto;
+            grid-template-areas:
+                "header sidebar"
+                "game sidebar"
+                "controls sidebar";
+            overflow: hidden;
+            position: relative;
+            /* Shift the entire game container to the right to make room for
+               the fixed advertisement banner.  The margin adapts to the
+               banner width via CSS variables applied in media queries. */
+            margin-left: 140px;
+        }
+        /* One‑column layout on narrow screens */
+        @media (max-width: 900px) {
+            .game-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto auto;
+                grid-template-areas:
+                    "header"
+                    "game"
+                    "sidebar"
+                    "controls";
+        /* reduce left margin to match the narrower advertisement banner */
+        margin-left: 100px;
+            }
+        }
+
+        /* Header */
+        .header {
+            grid-area: header;
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            background: linear-gradient(90deg, var(--sa-blue), var(--sa-green), var(--sa-yellow), var(--sa-red));
+            border-bottom: 3px solid var(--gold);
+        }
+        .logo {
+            height: 70px;
+            width: auto;
+            margin-right: 16px;
+            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+            animation: pulsate 2s infinite;
+        }
+        .stats-bar {
+            display: flex;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            padding: 8px 16px;
+            border: 2px solid var(--gold);
+            gap: 14px;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 2px;
+            text-shadow: 0 0 6px rgba(255, 165, 0, 0.8);
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat:nth-child(2) .stat-label {
+            color: var(--gold);
+        }
+
+        /* Game area */
+        .game-area {
+            grid-area: game;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+        }
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 10px;
+            flex: 1;
+        }
+        .game-cell {
+            background: rgba(30, 30, 40, 0.8);
+            border-radius: 10px;
+            border: 2px solid #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            overflow: hidden;
+        }
+        .game-cell:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+        }
+        .game-cell.active {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: #ff4500;
+            animation: pulse 0.5s;
+        }
+        .icon-image {
+            /* Further enlarge icons on the game board for better visibility */
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+        .game-cell.active .icon-image {
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 6px rgba(255, 69, 0, 0.8));
+        }
+
+        /* Controls */
+        .controls {
+            grid-area: controls;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 18px;
+            padding: 16px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+        }
+        .btn {
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-width: 180px;
+            transition: all 0.3s ease;
+        }
+        .btn-gold {
+            background: linear-gradient(to bottom, var(--gold), var(--orange));
+            color: #000;
+            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.5);
+        }
+        .btn-gold:hover {
+            background: linear-gradient(to bottom, #ffc400, #ff7700);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.7);
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--gold);
+            border: 2px solid var(--gold);
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+        }
+        .btn-outline:hover {
+            background: rgba(255, 215, 0, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            grid-area: sidebar;
+            background: rgba(10, 10, 20, 0.9);
+            border-left: 3px solid var(--gold);
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            /*
+             * Allow the entire sidebar to scroll vertically if its content is taller
+             * than the available space in the game container.  This replaces
+             * scrollbars on individual panels with a single scroll bar on the
+             * sidebar itself, keeping the main page fixed.
+             */
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        @media (max-width: 900px) {
+            .sidebar {
+                border-left: none;
+                border-top: 3px solid var(--gold);
+            }
+        }
+        .panel {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 12px;
+            padding: 16px;
+            border: 2px solid #444;
+            margin-bottom: 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .panel-title {
+            color: #ff4500;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 4px rgba(255, 69, 0, 0.7);
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--gold);
+        }
+        .leaderboard-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 4px;
+        }
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: rgba(0, 35, 149, 0.3);
+            border-radius: 8px;
+            margin-bottom: 6px;
+            border: 1px solid var(--gold);
+            color: white;
+            font-size: 0.9rem;
+        }
+        .leaderboard-item.winner {
+            background: linear-gradient(90deg, rgba(255, 184, 28, 0.3), rgba(222, 56, 49, 0.3));
+            border: 2px solid #ff4500;
+        }
+        .leaderboard-position {
+            font-weight: bold;
+            color: var(--gold);
+            min-width: 22px;
+            font-size: 1rem;
+            text-align: center;
+        }
+        .leaderboard-name {
+            flex: 1;
+            padding-left: 10px;
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .leaderboard-score {
+            font-weight: bold;
+            color: var(--gold);
+            min-width: 60px;
+            text-align: right;
+            font-size: 0.95rem;
+            text-shadow: 0 0 4px rgba(255, 215, 0, 0.5);
+        }
+        .prize-info {
+            text-align: center;
+            color: var(--gold);
+            margin-top: 6px;
+            font-size: 0.85rem;
+            padding: 8px;
+            background: rgba(222, 56, 49, 0.3);
+            border-radius: 6px;
+            border: 1px solid #ff4500;
+        }
+        .instructions {
+            color: var(--gold);
+            line-height: 1.4;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .mzansi-icons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .icon-card {
+            background: rgba(30, 30, 40, 0.8);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            border: 2px solid #444;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .icon-card:hover {
+            transform: translateY(-3px);
+            border-color: #ff4500;
+            box-shadow: 0 4px 12px rgba(255, 69, 0, 0.3);
+        }
+        .icon-card .icon-image {
+            /* Further enlarge icon previews in the how‑to panel */
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 6px;
+            object-fit: contain;
+        }
+        .icon-card .name {
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .share-section {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            padding: 12px;
+            border: 2px solid #444;
+            text-align: center;
+        }
+        .share-section h3 {
+            color: var(--gold);
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+            text-shadow: 0 0 4px rgba(255, 215, 0, 0.5);
+        }
+        .share-section p {
+            color: var(--gold);
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+        .share-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .share-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom, var(--gold), var(--orange));
+            color: #000;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .share-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 12px rgba(255, 140, 0, 0.7);
+        }
+
+        /* Game over screen */
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            border-radius: inherit;
+        }
+        .game-over.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .game-over h2 {
+            font-size: 2.8rem;
+            color: #ff4500;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 69, 0, 0.8);
+            animation: pulse 1.5s infinite;
+        }
+        .final-score {
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+            text-shadow: 0 0 8px rgba(255, 165, 0, 0.8);
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes pulsate {
+            0% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.8));
+            }
+            50% {
+                transform: scale(1.05);
+                filter: drop-shadow(0 0 16px rgba(255, 165, 0, 1));
+            }
+            100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.8));
+            }
+        }
+        /* Scrollbars */
+        .leaderboard-list::-webkit-scrollbar,
+        .instructions::-webkit-scrollbar {
+            width: 6px;
+        }
+        .leaderboard-list::-webkit-scrollbar-track,
+        .instructions::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+        .leaderboard-list::-webkit-scrollbar-thumb,
+        .instructions::-webkit-scrollbar-thumb {
+            background: var(--gold);
+            border-radius: 10px;
+        }
+
+        /* Overrides to disable internal scrollbars and allow content expansion */
+        .leaderboard-list {
+            flex: unset;
+            overflow-y: visible;
+        }
+        .instructions {
+            flex: unset;
+            overflow-y: visible;
+        }
+
+        /*
+         * Fullscreen advertisement overlay.  This overlay appears after each
+         * game session when the player clicks “Play Again”.  A 10‑second
+         * countdown prevents the user from skipping the ad, after which the
+         * callback resumes the next game.  The overlay is hidden by default
+         * using opacity and pointer‑events.
+         */
+        .ad-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 400;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .ad-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .ad-overlay img {
+            width: 60%;
+            max-width: 300px;
+            height: auto;
+            margin-bottom: 20px;
+            object-fit: contain;
+        }
+        .ad-countdown {
+            color: var(--gold);
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        /*
+         * Left-side advertisement banner.  The width is fixed on larger
+         * screens and reduces on narrower viewports.  We use a fixed
+         * position so that the banner stays in view while the user plays
+         * the game.  The game container shifts to the right via margin-left
+         * to accommodate this banner.
+         */
+        .left-ad {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 140px;
+            z-index: 150;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        .left-ad img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        /* Adjust banner width and game container margin on medium screens */
+        @media (max-width: 900px) {
+            .left-ad {
+                width: 100px;
+            }
+            /* shrink the left margin of the game container when the advert width decreases */
+            .game-container {
+                margin-left: 100px;
+            }
+        }
+        @media (max-width: 600px) {
+            .left-ad {
+                width: 80px;
+            }
+            .game-container {
+                margin-left: 80px;
+            }
+        }
+
+        /*
+         * Affiliate promotion box.  This replaces the advertisement banner on
+         * the left side of the page.  It maintains the same fixed position
+         * and width as the original banner so that the main game container
+         * continues to align correctly.  On smaller screens the width
+         * reduces and the margin of the game container is updated via media
+         * queries below.
+         */
+        .affiliate-box {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 140px;
+            z-index: 150;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 16px 8px;
+            background: rgba(10, 10, 20, 0.9);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .affiliate-title {
+            color: var(--gold);
+            font-size: 1rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .affiliate-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .affiliate-link {
+            text-decoration: none;
+        }
+        .affiliate-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            background: linear-gradient(90deg, rgba(0, 35, 149, 0.6), rgba(0, 119, 73, 0.6));
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            color: var(--gold);
+            font-size: 0.8rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .affiliate-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+            border-color: #ff4500;
+        }
+        .affiliate-item img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+
+        /* Responsive adjustments for the affiliate box and game container */
+        @media (max-width: 900px) {
+            .affiliate-box {
+                width: 100px;
+            }
+            .game-container {
+                margin-left: 100px;
+            }
+        }
+        @media (max-width: 600px) {
+            .affiliate-box {
+                width: 80px;
+            }
+            .game-container {
+                margin-left: 80px;
+            }
+        }
+        .panel {
+            overflow: visible;
+            flex: unset;
+        }
+        .game-container {
+            /* prevent any internal scroll on the entire game; respect fixed height */
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <!--
+        Affiliate promotion box.  Replaces the static advertisement banner
+        that previously occupied the left margin of the page.  This panel
+        remains fixed while the user plays the game and contains links to
+        recommended casinos.  Each entry displays the casino logo alongside
+        its name and opens the affiliate link in a new tab when clicked.
+        The width of this container matches the margin applied to the game
+        container so the layout remains consistent on different screen sizes.
+    -->
+    <div class="affiliate-box" id="affiliate-box">
+        <h3 class="affiliate-title">High Paying Online Casinos</h3>
+        <div class="affiliate-list">
+            <a href="https://playabets.click/o/_0ZCvM" target="_blank" class="affiliate-link">
+                <div class="affiliate-item">
+                    <img src="https://ik.imagekit.io/wholesomety/playabets%20logo%201.png" alt="Playabets logo" />
+                    <span>Playabets</span>
+                </div>
+            </a>
+            <a href="https://luckywolf.com/referral/THEMILKMAN" target="_blank" class="affiliate-link">
+                <div class="affiliate-item">
+                    <img src="https://ik.imagekit.io/wholesomety/lucky%20wolf%20logo.png" alt="Lucky Wolf logo" />
+                    <span>Lucky Wolf</span>
+                </div>
+            </a>
+            <a href="https://trackrt.tictacbets.co.za/o/xdDMNq" target="_blank" class="affiliate-link">
+                <div class="affiliate-item">
+                    <img src="https://ik.imagekit.io/wholesomety/TICTAC%20BETS%20LOGO.png" alt="TicTac Bets logo" />
+                    <span>TicTac Bets</span>
+                </div>
+            </a>
+            <a href="https://www.mbet.co.za/register?btag=Milk_Man" target="_blank" class="affiliate-link">
+                <div class="affiliate-item">
+                    <img src="https://ik.imagekit.io/wholesomety/mbet%20logo%20transparent.png" alt="Mbet logo" />
+                    <span>Mbet</span>
+                </div>
+            </a>
+            <a href="https://partners.10betaffiliates.co.za/visit/?bta=35725&brand=10betza" target="_blank" class="affiliate-link">
+                <div class="affiliate-item">
+                    <img src="https://ik.imagekit.io/wholesomety/10bet%20logo.png" alt="10bet logo" />
+                    <span>10Bet</span>
+                </div>
+            </a>
+        </div>
+    </div>
+    <!-- Sign‑up overlay -->
+    <div class="signup-container" id="signup-container">
+        <div class="signup-box">
+            <h2><i class="fas fa-user-plus"></i> Sign Up &amp; Play</h2>
+            <p>Sign up for a chance to win R100 in airtime this month!</p>
+            <form class="signup-form" id="signup-form">
+                <div class="form-group">
+                    <label for="username"><i class="fas fa-user"></i> Username</label>
+                    <input type="text" id="username" placeholder="Enter your username" required />
+                </div>
+                <div class="form-group">
+                    <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="email" placeholder="Enter your email" required />
+                </div>
+                <div class="form-group">
+                    <label for="phone"><i class="fas fa-phone"></i> Cell Phone</label>
+                    <input type="tel" id="phone" placeholder="e.g. 0821234567" required />
+                </div>
+                <button type="submit">
+                    <i class="fas fa-check"></i> Sign Up &amp; Play
+                </button>
+            </form>
+        </div>
+    </div>
+    <!-- Game UI -->
+    <div class="game-container" id="game-container" style="display: none;">
+        <!-- Header -->
+        <div class="header">
+            <img src="https://ik.imagekit.io/wholesomety/logo.png" alt="Mzansi Taps Logo" class="logo" />
+            <div class="title-container"></div>
+            <div class="stats-bar">
+                <div class="stat">
+                    <div class="stat-value" id="username-display">Guest</div>
+                    <div class="stat-label">Player</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="score">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="level">1</div>
+                    <div class="stat-label">Level</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="timer">60</div>
+                    <div class="stat-label">Time left</div>
+                </div>
+            </div>
+        </div>
+        <!-- Game area -->
+        <div class="game-area">
+            <div class="game-board" id="game-board">
+                <!-- generated by JS -->
+            </div>
+        </div>
+        <!-- Controls -->
+        <div class="controls">
+            <button class="btn btn-gold" id="start-btn">
+                <i class="fas fa-play"></i> Start Game
+            </button>
+            <button class="btn btn-outline" id="reset-btn">
+                <i class="fas fa-redo"></i> Reset Game
+            </button>
+        </div>
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Leaderboard -->
+            <div class="panel">
+                <h3 class="panel-title"><i class="fas fa-trophy"></i> Monthly Leaderboard</h3>
+                <div class="leaderboard-list" id="leaderboard">
+                    <div class="leaderboard-item winner">
+                        <div class="leaderboard-position">1</div>
+                        <div class="leaderboard-name">Lerato M.</div>
+                        <div class="leaderboard-score">12,450</div>
+                    </div>
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-position">2</div>
+                        <div class="leaderboard-name">Thabo K.</div>
+                        <div class="leaderboard-score">11,200</div>
+                    </div>
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-position">3</div>
+                        <div class="leaderboard-name">Nomsa P.</div>
+                        <div class="leaderboard-score">9,870</div>
+                    </div>
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-position">4</div>
+                        <div class="leaderboard-name">Sipho D.</div>
+                        <div class="leaderboard-score">8,650</div>
+                    </div>
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-position">5</div>
+                        <div class="leaderboard-name">Zinhle T.</div>
+                        <div class="leaderboard-score">7,890</div>
+                    </div>
+                </div>
+                <div class="prize-info">
+                    <i class="fas fa-gift"></i> Top scorer this month wins R100 in airtime!
+                    <!-- default month display updated to August 2025; setMonthDisplay will override when the user signs up -->
+                    <span id="month-display">August 2025</span>
+                </div>
+            </div>
+            <!-- Instructions -->
+            <div class="panel">
+                <h3 class="panel-title"><i class="fas fa-info-circle"></i> How to Play</h3>
+                <div class="instructions">
+                    <p>Tap the South African icons as they appear! You earn points for each successful tap.</p>
+                    <p>Each level gets faster – be quick or you'll miss them! The game lasts for 60 seconds.</p>
+                    <div class="mzansi-icons">
+                        <div class="icon-card">
+                            <img src="https://ik.imagekit.io/wholesomety/tokoloshe.png" alt="Tokoloshe" class="icon-image" />
+                            <div class="name">Tokoloshe</div>
+                        </div>
+                        <div class="icon-card">
+                            <img src="https://ik.imagekit.io/wholesomety/slayqueen.png" alt="Slay Queen" class="icon-image" />
+                            <div class="name">Slay Queen</div>
+                        </div>
+                        <div class="icon-card">
+                            <img src="https://ik.imagekit.io/wholesomety/tikkop.png" alt="Tik Kop" class="icon-image" />
+                            <div class="name">Tik Kop</div>
+                        </div>
+                        <div class="icon-card">
+                            <img src="https://ik.imagekit.io/wholesomety/taxi.png" alt="Taxi" class="icon-image" />
+                            <div class="name">Taxi</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Share Section -->
+            <div class="share-section">
+                <h3>Share with Friends!</h3>
+                <p>Challenge your friends for the top spot</p>
+                <div class="share-buttons">
+                    <div class="share-btn" onclick="shareOnFacebook()">
+                        <i class="fab fa-facebook-f"></i>
+                    </div>
+                    <div class="share-btn" onclick="shareOnTwitter()">
+                        <i class="fab fa-twitter"></i>
+                    </div>
+                    <div class="share-btn" onclick="shareOnWhatsApp()">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <div class="share-btn" onclick="copyGameLink()">
+                        <i class="fas fa-link"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Game over overlay -->
+        <div class="game-over" id="game-over">
+            <h2>Game Over!</h2>
+            <div class="final-score">Your score: <span id="final-score">0</span></div>
+            <button class="btn btn-gold" id="play-again">
+                <i class="fas fa-redo"></i> Play Again
+            </button>
+        </div>
+    <!-- Advertisement overlay shown between game sessions -->
+    <div class="ad-overlay" id="ad-overlay">
+        <img src="img_336.gif" alt="Advertisement" />
+        <div class="ad-countdown" id="ad-countdown">10</div>
+    </div>
+    </div>
+
+    <!-- Game logic -->
+    <script>
+        const gameContainer = document.getElementById('game-container');
+        const gameBoard = document.getElementById('game-board');
+        const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const timerElement = document.getElementById('timer');
+        const startButton = document.getElementById('start-btn');
+        const resetButton = document.getElementById('reset-btn');
+        const gameOverScreen = document.getElementById('game-over');
+        const finalScoreElement = document.getElementById('final-score');
+        const playAgainButton = document.getElementById('play-again');
+        const signupContainer = document.getElementById('signup-container');
+        const signupForm = document.getElementById('signup-form');
+        const usernameDisplay = document.getElementById('username-display');
+        const monthDisplay = document.getElementById('month-display');
+
+        // Advertisement overlay elements
+        const adOverlay = document.getElementById('ad-overlay');
+        const adCountdownEl = document.getElementById('ad-countdown');
+        let adCountdownTimer;
+
+        /**
+         * Show the advertisement overlay for a fixed number of seconds.  The
+         * callback is executed after the countdown reaches zero.  During
+         * playback the overlay cannot be skipped.
+         * @param {Function} callback function invoked after the countdown
+         */
+        function showAdOverlay(callback) {
+            let remaining = 10;
+            adCountdownEl.textContent = remaining;
+            adOverlay.classList.add('show');
+            // Clear any previous timer
+            if (adCountdownTimer) clearInterval(adCountdownTimer);
+            adCountdownTimer = setInterval(() => {
+                remaining -= 1;
+                adCountdownEl.textContent = remaining;
+                if (remaining <= 0) {
+                    clearInterval(adCountdownTimer);
+                    adOverlay.classList.remove('show');
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
+                }
+            }, 1000);
+        }
+
+        // Icon paths
+        const imagePaths = [
+            'https://ik.imagekit.io/wholesomety/tokoloshe.png',
+            'https://ik.imagekit.io/wholesomety/slayqueen.png',
+            'https://ik.imagekit.io/wholesomety/tikkop.png',
+            'https://ik.imagekit.io/wholesomety/taxi.png'
+        ];
+
+        // State variables
+        let score = 0;
+        let level = 1;
+        let timeLeft = 60;
+        let gameActive = false;
+        let gameTimer;
+        let spawnTimer;
+        let currentUser = null;
+
+        // Create the 4x4 grid
+        function initializeBoard() {
+            gameBoard.innerHTML = '';
+            for (let i = 0; i < 16; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'game-cell';
+                cell.dataset.index = i;
+                const img = document.createElement('img');
+                img.className = 'icon-image';
+                img.alt = 'Mzansi Icon';
+                // Placeholder transparent svg prevents layout shift
+                img.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"></svg>';
+                cell.appendChild(img);
+                cell.addEventListener('click', handleCellClick);
+                gameBoard.appendChild(cell);
+            }
+        }
+
+        // Handle tap on cell
+        function handleCellClick(e) {
+            if (!gameActive) return;
+            const cell = e.currentTarget;
+            if (cell.classList.contains('active')) {
+                cell.classList.remove('active');
+                score += level * 10;
+                scoreElement.textContent = score;
+                playTapSound();
+                // brief highlight effect
+                cell.style.backgroundColor = 'rgba(255, 215, 0, 0.3)';
+                setTimeout(() => {
+                    cell.style.backgroundColor = '';
+                }, 250);
+            }
+        }
+
+        // Spawn an icon randomly
+        function spawnIcon() {
+            if (!gameActive) return;
+            const activeCells = document.querySelectorAll('.game-cell.active');
+            activeCells.forEach(c => c.classList.remove('active'));
+            const cells = document.querySelectorAll('.game-cell');
+            if (!cells.length) return;
+            const randomIndex = Math.floor(Math.random() * cells.length);
+            const randomCell = cells[randomIndex];
+            const imageIndex = Math.floor(Math.random() * imagePaths.length);
+            const img = randomCell.querySelector('.icon-image');
+            img.src = imagePaths[imageIndex];
+            randomCell.classList.add('active');
+            // Remove after time interval if not tapped
+            const duration = Math.max(300, 900 - level * 100);
+            setTimeout(() => {
+                randomCell.classList.remove('active');
+            }, duration);
+        }
+
+        // Start or resume the game
+        function startGame() {
+            if (gameActive) return;
+            gameActive = true;
+            score = 0;
+            level = 1;
+            timeLeft = 60;
+            scoreElement.textContent = score;
+            levelElement.textContent = level;
+            timerElement.textContent = timeLeft;
+            startButton.innerHTML = '<i class="fas fa-pause"></i> Pause Game';
+            gameOverScreen.classList.remove('show');
+            gameTimer = setInterval(updateTimer, 1000);
+            spawnTimer = setInterval(spawnIcon, 800);
+        }
+
+        // Pause the game
+        function pauseGame() {
+            gameActive = false;
+            clearInterval(gameTimer);
+            clearInterval(spawnTimer);
+            startButton.innerHTML = '<i class="fas fa-play"></i> Resume Game';
+        }
+
+        // Reset to initial state
+        function resetGame() {
+            pauseGame();
+            score = 0;
+            level = 1;
+            timeLeft = 60;
+            scoreElement.textContent = score;
+            levelElement.textContent = level;
+            timerElement.textContent = timeLeft;
+            startButton.innerHTML = '<i class="fas fa-play"></i> Start Game';
+            document.querySelectorAll('.game-cell.active').forEach(c => c.classList.remove('active'));
+        }
+
+        // Timer countdown
+        function updateTimer() {
+            timeLeft--;
+            timerElement.textContent = timeLeft;
+            if (timeLeft > 0 && timeLeft % 15 === 0) {
+                level++;
+                levelElement.textContent = level;
+                clearInterval(spawnTimer);
+                // accelerate spawn time but not below 200ms
+                spawnTimer = setInterval(spawnIcon, Math.max(300, 800 - level * 80));
+            }
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }
+
+        // End the game
+        function endGame() {
+            gameActive = false;
+            clearInterval(gameTimer);
+            clearInterval(spawnTimer);
+            finalScoreElement.textContent = score;
+            gameOverScreen.classList.add('show');
+            document.querySelectorAll('.game-cell.active').forEach(c => c.classList.remove('active'));
+        }
+
+        // Simple tap sound using Web Audio API
+        function playTapSound() {
+            try {
+                const context = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = context.createOscillator();
+                const gainNode = context.createGain();
+                oscillator.type = 'sine';
+                oscillator.frequency.value = 300 + Math.random() * 200;
+                oscillator.connect(gainNode);
+                gainNode.connect(context.destination);
+                gainNode.gain.value = 0.3;
+                oscillator.start();
+                setTimeout(() => oscillator.stop(), 80);
+            } catch (e) {
+                console.log('Audio error:', e);
+            }
+        }
+
+        // Set month display to current month/year
+        function setMonthDisplay() {
+            /*
+             * Display the next calendar month in the sidebar prize info.  On
+             * July 30, 2025 this will show “August 2025”.  By calculating
+             * nextMonth/index we ensure the display advances automatically
+             * when a month changes (rolling over to January of the next year).
+             */
+            const monthNames = [
+                'January','February','March','April','May','June',
+                'July','August','September','October','November','December'
+            ];
+            const now = new Date();
+            let monthIndex = now.getMonth() + 1;
+            let year = now.getFullYear();
+            if (monthIndex > 11) {
+                monthIndex = 0;
+                year += 1;
+            }
+            monthDisplay.textContent = `${monthNames[monthIndex]} ${year}`;
+        }
+
+        // Social sharing functions
+        function shareOnFacebook() {
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+        }
+        function shareOnTwitter() {
+            const text = encodeURIComponent('Check out Mzansi Taps – the ultimate South African tapping game!');
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+        }
+        function shareOnWhatsApp() {
+            const text = encodeURIComponent('Play Mzansi Taps with me! Can you beat my score? ');
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://api.whatsapp.com/send?text=${text}${url}`, '_blank');
+        }
+        function copyGameLink() {
+            navigator.clipboard.writeText(window.location.href);
+            alert('Game link copied to clipboard!');
+        }
+
+        // Handle sign‑up submission
+        function handleSignup(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            currentUser = { username, email, phone, signupDate: new Date() };
+            usernameDisplay.textContent = username || 'Guest';
+            signupContainer.style.display = 'none';
+            gameContainer.style.display = 'grid';
+            initializeBoard();
+            setMonthDisplay();
+            alert(`Welcome to Mzansi Taps, ${username}! Good luck winning R100 in airtime this month!`);
+        }
+
+        function initGame() {
+            signupForm.addEventListener('submit', handleSignup);
+            startButton.addEventListener('click', () => {
+                if (gameActive) {
+                    pauseGame();
+                } else {
+                    startGame();
+                }
+            });
+            resetButton.addEventListener('click', resetGame);
+            playAgainButton.addEventListener('click', () => {
+                // Hide the game over screen and show a non‑skippable ad
+                gameOverScreen.classList.remove('show');
+                showAdOverlay(() => {
+                    startGame();
+                });
+            });
+        }
+        window.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
