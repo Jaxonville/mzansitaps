@@ -148,7 +148,8 @@
                 "controls sidebar";
             overflow: hidden;
             position: relative;
-            margin-left: 140px;
+            /* Remove left margin now that affiliate sidebar has been removed */
+            margin-left: 0;
         }
         @media (max-width: 900px) {
             .game-container {
@@ -159,7 +160,8 @@
                     "game"
                     "sidebar"
                     "controls";
-                margin-left: 100px;
+                /* Remove margin for smaller screens */
+                margin-left: 0;
             }
         }
 
@@ -577,77 +579,17 @@
             overflow-y: visible;
         }
 
-        .affiliate-box {
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            width: 140px;
-            z-index: 150;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 16px 8px;
-            background: rgba(10, 10, 20, 0.9);
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-        .affiliate-title {
-            color: var(--gold);
-            font-size: 1rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .affiliate-list {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .affiliate-link {
-            text-decoration: none;
-        }
-        .affiliate-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 10px;
-            background: linear-gradient(90deg, rgba(0, 35, 149, 0.6), rgba(0, 119, 73, 0.6));
-            border: 2px solid var(--gold);
-            border-radius: 12px;
-            color: var(--gold);
-            font-size: 0.8rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-        }
-        .affiliate-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
-            border-color: #ff4500;
-        }
-        .affiliate-item img {
-            width: 28px;
-            height: 28px;
-            object-fit: contain;
-        }
 
         @media (max-width: 900px) {
-            .affiliate-box {
-                width: 100px;
-            }
+            /* Removed affiliate sidebar, so no specific width needed */
+            /* Ensure game container remains centered on smaller screens */
             .game-container {
-                margin-left: 100px;
+                margin-left: 0;
             }
         }
         @media (max-width: 600px) {
-            .affiliate-box {
-                width: 80px;
-            }
             .game-container {
-                margin-left: 80px;
+                margin-left: 0;
             }
         }
         .panel {
@@ -722,52 +664,7 @@
     </style>
 </head>
 <body>
-    <!-- Affiliate box with obfuscated links -->
-    <div class="affiliate-box" id="affiliate-box">
-        <h3 class="affiliate-title">High Paying Online Casinos</h3>
-        <div class="affiliate-list">
-            <a href="https://bio.site/wholesomety" class="affiliate-link" data-link="playabets" style="text-decoration: none;">
-                <div class="affiliate-item">
-                    <img src="https://ik.imagekit.io/wholesomety/playabets%20logo%201.png" alt="Playabets logo" />
-                    <span>Playabets</span>
-                </div>
-            </a>
-            <a href="https://bio.site/wholesomety" class="affiliate-link" data-link="luckywolf" style="text-decoration: none;">
-                <div class="affiliate-item">
-                    <img src="https://ik.imagekit.io/wholesomety/lucky%20wolf%20logo.png" alt="Lucky Wolf logo" />
-                    <span>Lucky Wolf</span>
-                </div>
-            </a>
-            <a href="https://bio.site/wholesomety" class="affiliate-link" data-link="tictac" style="text-decoration: none;">
-                <div class="affiliate-item">
-                    <img src="https://ik.imagekit.io/wholesomety/TICTAC%20BETS%20LOGO.png" alt="TicTac Bets logo" />
-                    <span>TicTac Bets</span>
-                </div>
-            </a>
-            <a href="https://bio.site/wholesomety" class="affiliate-link" data-link="mbet" style="text-decoration: none;">
-                <div class="affiliate-item">
-                    <img src="https://ik.imagekit.io/wholesomety/mbet%20logo%20transparent.png" alt="Mbet logo" />
-                    <span>Mbet</span>
-                </div>
-            </a>
-            <a href="https://bio.site/wholesomety" class="affiliate-link" data-link="tenbet" style="text-decoration: none;">
-                <div class="affiliate-item">
-                    <img src="https://ik.imagekit.io/wholesomety/10bet%20logo.png" alt="10bet logo" />
-                    <span>10Bet</span>
-                </div>
-            </a>
-        </div>
-    </div>
-    
-    <!-- Link obfuscation modal -->
-    <div class="link-modal" id="link-modal">
-        <div class="link-content">
-            <h3>Redirecting to Partner Site</h3>
-            <p>You're being redirected to our trusted partner site. Please wait...</p>
-            <div class="link-button" id="redirect-button">Click to Continue</div>
-            <div class="link-countdown" id="countdown">5</div>
-        </div>
-    </div>
+    <!-- Affiliate box removed -->
     
     <!-- Sign-up overlay -->
     <div class="signup-container" id="signup-container">
@@ -832,6 +729,11 @@
             </button>
             <button class="btn btn-outline" id="reset-btn">
                 <i class="fas fa-redo"></i> Reset Game
+            </button>
+
+            <!-- Bonus button: redirects players to claim their bonus -->
+            <button class="btn btn-gold" id="bonus-btn">
+                <i class="fas fa-gift"></i> Claim Bonus
             </button>
 
             <!-- Sound controls: toggle and volume slider -->
@@ -959,9 +861,7 @@
         const signupForm = document.getElementById('signup-form');
         const usernameDisplay = document.getElementById('username-display');
         const monthDisplay = document.getElementById('month-display');
-        const linkModal = document.getElementById('link-modal');
-        const redirectButton = document.getElementById('redirect-button');
-        const countdownElement = document.getElementById('countdown');
+        // Affiliate modal elements removed: linkModal, redirectButton, countdownElement
 
         // Sound elements and state
         const bgMusic = document.getElementById('bg-music');
@@ -1009,19 +909,7 @@
             if (tapGain) tapGain.gain.value = vol * 0.5;
         }
 
-        // Obfuscated affiliate links
-        // All affiliate links now point to the same destination (bio.site/wholesomety).
-        // Each value is a base64‑encoded version of https://bio.site/wholesomety
-        const affiliateLinks = {
-            playabets: 'aHR0cHM6Ly9iaW8uc2l0ZS93aG9sZXNvbWV0eQ==',
-            luckywolf: 'aHR0cHM6Ly9iaW8uc2l0ZS93aG9sZXNvbWV0eQ==',
-            tictac: 'aHR0cHM6Ly9iaW8uc2l0ZS93aG9sZXNvbWV0eQ==',
-            mbet: 'aHR0cHM6Ly9iaW8uc2l0ZS93aG9sZXNvbWV0eQ==',
-            tenbet: 'aHR0cHM6Ly9iaW8uc2l0ZS93aG9sZXNvbWV0eQ=='
-        };
-
-        // Current link to redirect to
-        let currentRedirectUrl = '';
+        // Affiliate links removed
 
         // Icon paths
         const imagePaths = [
@@ -1252,49 +1140,11 @@
             alert(`Welcome to Mzansi Taps, ${username}! Good luck winning R100 in airtime this month!`);
         }
 
-        // Handle affiliate link clicks
-        function handleAffiliateClick(e) {
-            e.preventDefault();
-            const casino = e.currentTarget.dataset.link;
-            
-            if (affiliateLinks[casino]) {
-                // Decode the base64 URL
-                currentRedirectUrl = atob(affiliateLinks[casino]);
-                
-                // Show the redirect modal
-                linkModal.classList.add('show');
-                
-                // Start countdown
-                let countdown = 5;
-                countdownElement.textContent = countdown;
-                
-                const countdownInterval = setInterval(() => {
-                    countdown--;
-                    countdownElement.textContent = countdown;
-                    
-                    if (countdown <= 0) {
-                        clearInterval(countdownInterval);
-                        window.open(currentRedirectUrl, '_blank');
-                        linkModal.classList.remove('show');
-                    }
-                }, 1000);
-            }
-        }
+        // Affiliate click handler removed
 
         // Initialize the game
         function initGame() {
-            // Set up affiliate links
-            document.querySelectorAll('.affiliate-link').forEach(link => {
-                link.addEventListener('click', handleAffiliateClick);
-            });
-            
-            // Set up manual redirect button
-            redirectButton.addEventListener('click', () => {
-                if (currentRedirectUrl) {
-                    window.open(currentRedirectUrl, '_blank');
-                    linkModal.classList.remove('show');
-                }
-            });
+            // Affiliate link handling removed
             
             // Initialize sound system and controls
             initSound();
@@ -1319,6 +1169,14 @@
             });
             
             resetButton.addEventListener('click', resetGame);
+
+            // Bonus button click redirects to the bonus page
+            const bonusButton = document.getElementById('bonus-btn');
+            if (bonusButton) {
+                bonusButton.addEventListener('click', () => {
+                    window.open('https://bio.site/wholesomety', '_blank');
+                });
+            }
             
             playAgainButton.addEventListener('click', () => {
                 gameOverScreen.classList.remove('show');
