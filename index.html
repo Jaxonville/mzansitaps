@@ -928,6 +928,67 @@
         let spawnTimer;
         let currentUser = null;
 
+        // Leaderboard data will be stored locally. Each entry has { name, score }.
+        let leaderboardData = [];
+
+        // Load leaderboard data from localStorage
+        function loadLeaderboard() {
+            const stored = localStorage.getItem('mzansi_leaderboard');
+            leaderboardData = stored ? JSON.parse(stored) : [];
+        }
+
+        // Save leaderboard data back to localStorage
+        function saveLeaderboard() {
+            localStorage.setItem('mzansi_leaderboard', JSON.stringify(leaderboardData));
+        }
+
+        // Render the leaderboard on the page
+        function renderLeaderboard() {
+            const list = document.getElementById('leaderboard');
+            if (!list) return;
+            // Clear any existing children (including initial static markup)
+            list.innerHTML = '';
+            leaderboardData.forEach((entry, index) => {
+                const item = document.createElement('div');
+                // Highlight the top scorer
+                item.className = 'leaderboard-item' + (index === 0 ? ' winner' : '');
+                const pos = document.createElement('div');
+                pos.className = 'leaderboard-position';
+                pos.textContent = index + 1;
+                const name = document.createElement('div');
+                name.className = 'leaderboard-name';
+                name.textContent = entry.name;
+                const scoreEl = document.createElement('div');
+                scoreEl.className = 'leaderboard-score';
+                scoreEl.textContent = entry.score;
+                item.appendChild(pos);
+                item.appendChild(name);
+                item.appendChild(scoreEl);
+                list.appendChild(item);
+            });
+        }
+
+        // Update or insert a score entry and re-render the leaderboard
+        function updateLeaderboardEntry(name, newScore) {
+            if (!name || name.trim() === '') name = 'Guest';
+            // Check if user already exists in the leaderboard
+            const existing = leaderboardData.find(e => e.name === name);
+            if (existing) {
+                // Replace only if the new score is higher
+                if (newScore > existing.score) {
+                    existing.score = newScore;
+                }
+            } else {
+                leaderboardData.push({ name: name, score: newScore });
+            }
+            // Sort in descending order
+            leaderboardData.sort((a, b) => b.score - a.score);
+            // Keep only top 5 entries
+            leaderboardData = leaderboardData.slice(0, 5);
+            saveLeaderboard();
+            renderLeaderboard();
+        }
+
         // Create the 4x4 grid
         function initializeBoard() {
             gameBoard.innerHTML = '';
@@ -1067,6 +1128,14 @@
                 bgMusic.pause();
                 bgMusic.currentTime = 0;
             } catch (err) {}
+
+            // Update leaderboard with this game's score
+            try {
+                const playerName = currentUser && currentUser.username ? currentUser.username : 'Guest';
+                updateLeaderboardEntry(playerName, score);
+            } catch (err) {
+                console.warn('Failed to update leaderboard', err);
+            }
         }
 
         // Play a simple tap sound using the shared AudioContext
@@ -1146,6 +1215,10 @@
         function initGame() {
             // Affiliate link handling removed
             
+            // Load stored leaderboard and render it
+            loadLeaderboard();
+            renderLeaderboard();
+
             // Initialize sound system and controls
             initSound();
             // Sound toggle and volume handlers
