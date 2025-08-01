@@ -614,6 +614,35 @@
                 margin-left: 0;
             }
         }
+
+        /* Additional responsive tweaks for very small screens */
+        @media (max-width: 600px) {
+            /* Reduce button sizes and spacing on small screens */
+            .btn {
+                min-width: 140px;
+                font-size: 0.8rem;
+                padding: 10px 20px;
+            }
+            .sound-controls input[type="range"] {
+                width: 80px;
+            }
+            .logo {
+                height: 50px;
+            }
+            .leaderboard-name, .leaderboard-score {
+                font-size: 0.75rem;
+            }
+            .leaderboard-position {
+                width: 20px;
+                font-size: 0.8rem;
+            }
+            .controls {
+                gap: 12px;
+            }
+            .game-container {
+                min-height: 80vh;
+            }
+        }
         .panel {
             overflow: visible;
             flex: unset;
