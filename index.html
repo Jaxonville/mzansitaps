@@ -27,7 +27,15 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow: hidden;
+            /*
+             * Allow the page to scroll vertically on smaller screens. On desktop
+             * the game fills the viewport but on mobile we don't want
+             * important controls hidden off‑screen. Use overflow‑x hidden to
+             * prevent horizontal scrolling and overflow‑y auto to enable
+             * vertical scrolling when needed.
+             */
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
         body {
@@ -131,25 +139,150 @@
 
         .game-container {
             width: 100%;
-            max-width: 1100px;
-            height: 95vh;
-            max-height: 95vh;
-            min-height: 600px;
+            max-width: 600px;
+            /* Mobile focused: single column layout that stacks the header,
+               game area, controls, and info section vertically. */
+            min-height: 100vh;
+            height: auto;
+            max-height: none;
             background: rgba(0, 0, 0, 0.85);
             border-radius: 18px;
             border: 4px solid var(--gold);
             box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
             display: grid;
-            grid-template-columns: 2fr 1fr;
-            grid-template-rows: auto 1fr auto;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr auto auto;
             grid-template-areas:
-                "header sidebar"
-                "game sidebar"
-                "controls sidebar";
+                "header"
+                "game"
+                "controls"
+                "info";
             overflow: hidden;
             position: relative;
-            /* Remove left margin now that affiliate sidebar has been removed */
+            padding-bottom: 80px;
             margin-left: 0;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        /*
+         * Responsive adjustments for mobile devices. When the viewport is
+         * narrower than 600px we collapse the sidebar into an info modal
+         * accessible by the info button. The main controls (start, reset,
+         * claim bonus) remain visible and scale up to fill most of the
+         * available width. We also reduce padding and font sizes for
+         * compactness on small screens.
+         */
+
+        /* Info modal overlay for mobile. This appears when the info button is
+           tapped and contains the leaderboard, instructions and share
+           buttons. */
+        .info-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            /* Hidden by default; becomes flex when the .show class is added */
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .info-modal.show {
+            display: flex;
+            opacity: 1;
+            pointer-events: all;
+        }
+        .info-content {
+            background: rgba(10, 10, 20, 0.95);
+            border: 3px solid var(--gold);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 90vh;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+        .info-content h3 {
+            color: var(--gold);
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        .info-close {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            color: var(--gold);
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+        /* Mobile leaderboard inside the info modal */
+        #leaderboard-mobile {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 12px;
+        }
+        .info-prize {
+            text-align: center;
+            color: var(--gold);
+            background: rgba(222, 56, 49, 0.3);
+            border: 1px solid #ff4500;
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+        }
+        /* Instructions in info modal */
+        #instructions-mobile {
+            color: var(--gold);
+            line-height: 1.4;
+            margin-bottom: 12px;
+            overflow-y: auto;
+            flex: 1;
+            font-size: 0.9rem;
+        }
+        #instructions-mobile .mzansi-icons {
+            margin-top: 10px;
+        }
+        /* Share section inside info modal */
+        .share-mobile {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        /*
+         * Share bar that appears beneath the game controls on mobile. It reuses
+         * the existing share button styling but is hidden on larger screens.
+         */
+        .share-mobile-bar {
+            /* In mobile‑only version we want the share bar visible by default */
+            display: flex;
+            margin-top: 10px;
+            width: 100%;
+            justify-content: center;
+        }
+        .share-mobile-bar .share-buttons {
+            gap: 10px;
+        }
+
+        /* We no longer use a media query to show the share bar, because this
+           version of the game is mobile‑only. */
+        .share-mobile h4 {
+            color: var(--gold);
+            font-size: 1rem;
+            margin-bottom: 6px;
+        }
+        .share-mobile .share-buttons {
+            justify-content: center;
         }
         @media (max-width: 900px) {
             .game-container {
@@ -290,6 +423,46 @@
             outline: none;
             cursor: pointer;
         }
+
+        /*
+         * Since the game is now mobile‑only, apply the previously
+         * responsive rules by default. Control buttons will wrap and
+         * expand to nearly full width. The logo scales down, and sound
+         * controls are centered. Leaderboard columns are narrower to
+         * accommodate small screens.
+         */
+        .controls {
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 12px;
+        }
+        .controls .btn {
+            min-width: 90%;
+            font-size: 0.9rem;
+            padding: 12px 20px;
+        }
+        .sound-controls {
+            margin-left: 0;
+            justify-content: center;
+        }
+        .sound-controls input[type="range"] {
+            width: 140px;
+        }
+        .logo {
+            height: 50px;
+        }
+        .leaderboard-score {
+            width: 60px;
+            min-width: 60px;
+            font-size: 0.8rem;
+        }
+        .leaderboard-position {
+            width: 22px;
+            font-size: 0.8rem;
+        }
+        .leaderboard-name {
+            font-size: 0.8rem;
+        }
         .btn {
             padding: 12px 28px;
             font-size: 1rem;
@@ -329,20 +502,10 @@
         }
 
         .sidebar {
-            grid-area: sidebar;
-            background: rgba(10, 10, 20, 0.9);
-            border-left: 3px solid var(--gold);
-            display: flex;
-            flex-direction: column;
-            padding: 16px;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-        @media (max-width: 900px) {
-            .sidebar {
-                border-left: none;
-                border-top: 3px solid var(--gold);
-            }
+            /* Hide sidebar entirely in mobile‑only view. All sidebar content
+               (leaderboard, instructions, share buttons) is accessible via the
+               info modal. */
+            display: none;
         }
         .panel {
             background: rgba(0, 0, 0, 0.6);
@@ -495,6 +658,13 @@
             border: 2px solid #444;
             text-align: center;
         }
+
+        /* The info section holds leaderboard, instructions and sharing. In
+           mobile‑only view it occupies the final row of the game container. */
+        .info-section {
+            grid-area: info;
+            padding: 0 16px 16px;
+        }
         .share-section h3 {
             color: var(--gold);
             font-size: 1.1rem;
@@ -505,6 +675,13 @@
             color: var(--gold);
             font-size: 0.85rem;
             margin-bottom: 6px;
+        }
+
+        /* Ensure the info button is always visible. Without this the
+           default HTML style could hide the button. */
+        #info-btn {
+            /* Info button removed in mobile‑only view. Keep hidden. */
+            display: none;
         }
         .share-buttons {
             display: flex;
@@ -602,25 +779,13 @@
         /* Use default flex and overflow settings for leaderboard and instructions */
 
 
-        @media (max-width: 900px) {
-            /* Removed affiliate sidebar, so no specific width needed */
-            /* Ensure game container remains centered on smaller screens */
-            .game-container {
-                margin-left: 0;
-            }
-        }
-        @media (max-width: 600px) {
-            .game-container {
-                margin-left: 0;
-            }
-        }
-        .panel {
-            overflow: visible;
-            flex: unset;
-        }
-        .game-container {
-            overflow: hidden;
-        }
+        /*
+         * Allow panels to scroll within their own context on desktop. On
+         * mobile the sidebar is hidden, so this rule primarily affects the
+         * desktop view. We don't enforce any specific overflow here,
+         * instead rely on earlier definitions. Removing the previous
+         * overrides prevents conflicts with responsive behaviour.
+         */
         
         /* Link obfuscation modal */
         .link-modal {
@@ -683,54 +848,7 @@
             font-size: 1.2rem;
             margin-top: 20px;
         }
-    
-@media (max-width: 768px) {
-    body {
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-
-    .game-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100vw;
-    }
-
-    .grid-container {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        grid-gap: 10px;
-        padding: 10px;
-        width: 90vw;
-    }
-
-    .scoreboard,
-    .leaderboard,
-    .how-to-play,
-    .footer {
-        width: 90vw;
-        margin: 10px auto;
-    }
-
-    .scoreboard {
-        font-size: 1rem;
-        padding: 10px;
-    }
-
-    button {
-        width: 100%;
-        font-size: 1rem;
-    }
-
-    .affiliate-box,
-    .audio-control {
-        width: 90vw;
-        text-align: center;
-    }
-}
-
-</style>
+    </style>
 </head>
 <body>
     <!-- Affiliate box removed -->
@@ -808,6 +926,8 @@
                 <i class="fas fa-gift"></i> Claim Bonus
             </button>
 
+            <!-- Info button removed in mobile‑only view; the info section appears below automatically -->
+
             <!-- Sound controls: toggle and volume slider -->
             <div class="sound-controls">
                 <button id="sound-toggle" class="sound-toggle" aria-label="Toggle sound">
@@ -816,44 +936,20 @@
                 <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5" aria-label="Volume" />
             </div>
         </div>
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <!-- Leaderboard -->
+        <!-- Info section (mobile) containing leaderboard, instructions and share buttons -->
+        <div class="info-section">
+            <!-- Leaderboard Panel -->
             <div class="panel">
                 <h3 class="panel-title"><i class="fas fa-trophy"></i> Monthly Leaderboard</h3>
                 <div class="leaderboard-list" id="leaderboard">
-                    <div class="leaderboard-item winner">
-                        <div class="leaderboard-position">1</div>
-                        <div class="leaderboard-name">Lerato M.</div>
-                        <div class="leaderboard-score">12,450</div>
-                    </div>
-                    <div class="leaderboard-item">
-                        <div class="leaderboard-position">2</div>
-                        <div class="leaderboard-name">Thabo K.</div>
-                        <div class="leaderboard-score">11,200</div>
-                    </div>
-                    <div class="leaderboard-item">
-                        <div class="leaderboard-position">3</div>
-                        <div class="leaderboard-name">Nomsa P.</div>
-                        <div class="leaderboard-score">9,870</div>
-                    </div>
-                    <div class="leaderboard-item">
-                        <div class="leaderboard-position">4</div>
-                        <div class="leaderboard-name">Sipho D.</div>
-                        <div class="leaderboard-score">8,650</div>
-                    </div>
-                    <div class="leaderboard-item">
-                        <div class="leaderboard-position">5</极>
-                        <div class="leaderboard-name">Zinhle T.</div>
-                        <div class="leaderboard-score">7,890</div>
-                    </div>
+                    <!-- Dynamic leaderboard entries will be inserted here via JavaScript -->
                 </div>
                 <div class="prize-info">
                     <i class="fas fa-gift"></i> Top scorer this month wins R100 in airtime!
                     <span id="month-display">August 2025</span>
                 </div>
             </div>
-            <!-- Instructions -->
+            <!-- Instructions Panel -->
             <div class="panel">
                 <h3 class="panel-title"><i class="fas fa-info-circle"></i> How to Play</h3>
                 <div class="instructions">
@@ -899,11 +995,6 @@
                 </div>
             </div>
         </div>
-        <!-- Monthly prize message displayed prominently below the share section -->
-        <div class="prize-banner">
-            <i class="fas fa-gift"></i> Top scorer this month wins R100 in airtime!
-            <span id="prize-month-display">August 2025</span>
-        </div>
         <!-- Game over overlay -->
         <div class="game-over" id="game-over">
             <h2>Game Over!</h2>
@@ -912,6 +1003,8 @@
                 <i class="fas fa-redo"></i> Play Again
             </button>
         </div>
+
+        <!-- Info modal removed: mobile layout displays leaderboard and instructions below controls -->
     </div>
 
     <!-- Background music element -->
@@ -940,6 +1033,13 @@
         const monthDisplay = document.getElementById('month-display');
         // Display for the monthly prize message
         const prizeMonthDisplay = document.getElementById('prize-month-display');
+
+        // Mobile info modal elements
+        const infoBtn = document.getElementById('info-btn');
+        const infoModal = document.getElementById('info-modal');
+        const infoClose = document.getElementById('info-close');
+        const leaderboardMobileList = document.getElementById('leaderboard-mobile');
+        const mobilePrizeMonth = document.getElementById('mobile-prize-month');
         // Affiliate modal elements removed: linkModal, redirectButton, countdownElement
 
         // Sound elements and state
@@ -986,6 +1086,25 @@
             const vol = parseFloat(volumeSlider.value);
             bgMusic.volume = vol;
             if (tapGain) tapGain.gain.value = vol * 0.5;
+        }
+
+        // Show the info modal. Called directly from the info button's onclick.
+        function openInfo() {
+            try {
+                // Refresh the leaderboard lists
+                renderLeaderboard();
+                if (infoModal) infoModal.classList.add('show');
+            } catch (err) {
+                console.warn('Could not open info modal', err);
+            }
+        }
+        // Hide the info modal. Called from the close button in the modal.
+        function closeInfo() {
+            try {
+                if (infoModal) infoModal.classList.remove('show');
+            } catch (err) {
+                console.warn('Could not close info modal', err);
+            }
         }
 
         // Affiliate links removed
@@ -1045,6 +1164,28 @@
                 item.appendChild(scoreEl);
                 list.appendChild(item);
             });
+
+            // Also render the mobile leaderboard list if present
+            if (leaderboardMobileList) {
+                leaderboardMobileList.innerHTML = '';
+                leaderboardData.forEach((entry, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'leaderboard-item' + (index === 0 ? ' winner' : '');
+                    const pos = document.createElement('div');
+                    pos.className = 'leaderboard-position';
+                    pos.textContent = index + 1;
+                    const name = document.createElement('div');
+                    name.className = 'leaderboard-name';
+                    name.textContent = entry.name;
+                    const scoreEl = document.createElement('div');
+                    scoreEl.className = 'leaderboard-score';
+                    scoreEl.textContent = entry.score;
+                    item.appendChild(pos);
+                    item.appendChild(name);
+                    item.appendChild(scoreEl);
+                    leaderboardMobileList.appendChild(item);
+                });
+            }
         }
 
         // Update or insert a score entry and re-render the leaderboard
@@ -1255,6 +1396,10 @@
             if (prizeMonthDisplay) {
                 prizeMonthDisplay.textContent = `${monthNames[monthIndex]} ${year}`;
             }
+            // Update the mobile prize banner month if present
+            if (mobilePrizeMonth) {
+                mobilePrizeMonth.textContent = `${monthNames[monthIndex]} ${year}`;
+            }
         }
 
         // Social sharing functions
@@ -1344,6 +1489,18 @@
                 gameOverScreen.classList.remove('show');
                 startGame();
             });
+
+            // Info modal events (mobile)
+            if (infoBtn && infoModal && infoClose) {
+                infoBtn.addEventListener('click', () => {
+                    // Refresh the mobile leaderboard before showing
+                    renderLeaderboard();
+                    infoModal.classList.add('show');
+                });
+                infoClose.addEventListener('click', () => {
+                    infoModal.classList.remove('show');
+                });
+            }
         }
         
         window.addEventListener('DOMContentLoaded', initGame);
