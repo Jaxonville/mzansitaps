@@ -157,7 +157,10 @@
                 "game"
                 "controls"
                 "info";
-            overflow: hidden;
+            /* Allow the game container to scroll vertically when its content
+               exceeds the viewport. Avoid horizontal scrolling. */
+            overflow-x: hidden;
+            overflow-y: auto;
             position: relative;
             padding-bottom: 80px;
             margin-left: 0;
