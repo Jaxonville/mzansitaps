@@ -44,30 +44,6 @@
             padding: 20px;
         }
 
-        /* Device detection banner */
-        .device-banner {
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: var(--gold);
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            z-index: 500;
-            border: 2px solid var(--gold);
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: opacity 0.5s ease;
-        }
-        .device-banner.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
         .signup-container {
             position: fixed;
             top: 0;
@@ -172,10 +148,9 @@
                 "controls sidebar";
             overflow: hidden;
             position: relative;
+            /* Remove left margin now that affiliate sidebar has been removed */
             margin-left: 0;
         }
-        
-        /* Mobile Layout */
         @media (max-width: 900px) {
             .game-container {
                 grid-template-columns: 1fr;
@@ -185,123 +160,8 @@
                     "game"
                     "sidebar"
                     "controls";
-                min-height: 90vh;
-                height: auto;
-                max-height: none;
-            }
-            
-            .header {
-                flex-direction: column;
-                padding: 10px;
-            }
-            
-            .logo {
-                height: 50px;
-                margin-bottom: 10px;
-            }
-            
-            .stats-bar {
-                width: 100%;
-                gap: 5px;
-                padding: 5px 10px;
-            }
-            
-            .stat-value {
-                font-size: 1.1rem;
-            }
-            
-            .stat-label {
-                font-size: 0.7rem;
-            }
-            
-            .controls {
-                padding: 10px;
-                gap: 10px;
-            }
-            
-            .btn {
-                padding: 10px 15px;
-                font-size: 0.9rem;
-                min-width: 140px;
-            }
-            
-            .sidebar {
-                border-left: none;
-                border-top: 3px solid var(--gold);
-                max-height: 300px;
-                overflow-y: auto;
-            }
-            
-            .game-board {
-                gap: 5px;
-                padding: 5px;
-            }
-            
-            .icon-image {
-                width: 50px;
-                height: 50px;
-            }
-            
-            .game-cell {
-                border-radius: 6px;
-            }
-        }
-        
-        /* Desktop Layout */
-        @media (min-width: 901px) {
-            .device-banner {
-                top: 20px;
-                font-size: 1rem;
-                padding: 10px 25px;
-            }
-            
-            .game-container {
-                height: 85vh;
-            }
-            
-            .header {
-                padding: 15px 25px;
-            }
-            
-            .logo {
-                height: 70px;
-            }
-            
-            .stats-bar {
-                gap: 20px;
-                padding: 10px 20px;
-            }
-            
-            .stat-value {
-                font-size: 1.5rem;
-            }
-            
-            .stat-label {
-                font-size: 0.9rem;
-            }
-            
-            .game-board {
-                gap: 12px;
-                padding: 15px;
-            }
-            
-            .icon-image {
-                width: 80px;
-                height: 80px;
-            }
-            
-            .controls {
-                padding: 20px;
-                gap: 25px;
-            }
-            
-            .btn {
-                padding: 12px 28px;
-                font-size: 1.1rem;
-            }
-            
-            .sidebar {
-                padding: 20px;
+                /* Remove margin for smaller screens */
+                margin-left: 0;
             }
         }
 
@@ -370,7 +230,7 @@
             justify-content: center;
             cursor: pointer;
             position: relative;
-            transition: transform 0.2s ease, box-shadow 极.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
             overflow: hidden;
         }
         .game-cell:hover {
@@ -478,6 +338,12 @@
             overflow-y: auto;
             overflow-x: hidden;
         }
+        @media (max-width: 900px) {
+            .sidebar {
+                border-left: none;
+                border-top: 3px solid var(--gold);
+            }
+        }
         .panel {
             background: rgba(0, 0, 0, 0.6);
             border-radius: 12px;
@@ -506,6 +372,7 @@
             padding: 4px;
         }
         .leaderboard-item {
+            /* Lay out position, name and score horizontally */
             display: flex;
             align-items: center;
             justify-content: flex-start;
@@ -515,6 +382,7 @@
             margin-bottom: 6px;
             border: 1px solid var(--gold);
             color: white;
+            /* Slightly smaller font to accommodate long names/scores */
             font-size: 0.85rem;
         }
         .leaderboard-item.winner {
@@ -524,11 +392,13 @@
         .leaderboard-position {
             font-weight: bold;
             color: var(--gold);
+            /* Fixed width for the rank column */
             width: 24px;
             font-size: 0.9rem;
             text-align: center;
         }
         .leaderboard-name {
+            /* Allow the name to take up remaining space and clip if too long */
             flex: 1;
             padding-left: 10px;
             color: var(--gold);
@@ -537,10 +407,13 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            /* Prevent names from wrapping onto multiple lines */
+            white-space: nowrap;
         }
         .leaderboard-score {
             font-weight: bold;
             color: var(--gold);
+            /* Provide fixed width for the score column */
             width: 70px;
             min-width: 70px;
             white-space: nowrap;
@@ -718,7 +591,7 @@
         .leaderboard-list::-webkit-scrollbar-track,
         .instructions::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 10极;
+            border-radius: 10px;
         }
         .leaderboard-list::-webkit-scrollbar-thumb,
         .instructions::-webkit-scrollbar-thumb {
@@ -726,102 +599,141 @@
             border-radius: 10px;
         }
 
-        /* Very small screens */
-        @media (max-width: 480px) {
-            .device-banner {
-                font-size: 0.8rem;
-                padding: 6px 15px;
-                top: 5px;
-            }
-            
-            .signup-box {
-                padding: 20px;
-            }
-            
-            .signup-box h2 {
-                font-size: 1.4rem;
-            }
-            
-            .signup-form button {
-                padding: 10px 15px;
-                font-size: 0.9rem;
-            }
-            
+        /* Use default flex and overflow settings for leaderboard and instructions */
+
+
+        @media (max-width: 900px) {
+            /* Removed affiliate sidebar, so no specific width needed */
+            /* Ensure game container remains centered on smaller screens */
             .game-container {
-                min-height: 85vh;
-                height: 85vh;
-                max-height: none;
-                border-radius: 12px;
-            }
-            
-            .stats-bar {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            
-            .stat {
-                min-width: 70px;
-            }
-            
-            .game-board {
-                gap: 4px;
-                padding: 4px;
-            }
-            
-            .icon-image {
-                width: 40px;
-                height: 40px;
-            }
-            
-            .btn {
-                min-width: 120px;
-                padding: 8px 12px;
-                font-size: 0.8rem;
-            }
-            
-            .controls {
-                flex-direction: column;
-                gap: 8px;
-            }
-            
-            .sound-controls {
                 margin-left: 0;
-                margin-top: 10px;
-            }
-            
-            .sound-controls input[type="range"] {
-                width: 80px;
-            }
-            
-            .sidebar {
-                max-height: 250px;
-            }
-            
-            .panel-title {
-                font-size: 1rem;
-            }
-            
-            .leaderboard-name, 
-            .leaderboard-score {
-                font-size: 0.75rem;
-            }
-            
-            .game-over h2 {
-                font-size: 2rem;
-            }
-            
-            .final-score {
-                font-size: 1.5rem;
             }
         }
-    </style>
+        @media (max-width: 600px) {
+            .game-container {
+                margin-left: 0;
+            }
+        }
+        .panel {
+            overflow: visible;
+            flex: unset;
+        }
+        .game-container {
+            overflow: hidden;
+        }
+        
+        /* Link obfuscation modal */
+        .link-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .link-modal.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .link-content {
+            background: linear-gradient(135deg, var(--sa-blue), var(--sa-green));
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 90%;
+            width: 500px;
+            text-align: center;
+            border: 3px solid var(--gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+        .link-content h3 {
+            color: var(--gold);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        .link-content p {
+            color: var(--gold);
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+        .link-button {
+            padding: 12px 28px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(to bottom, var(--gold), var(--orange));
+            color: #000;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        .link-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.7);
+        }
+        .link-countdown {
+            color: var(--gold);
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+    
+@media (max-width: 768px) {
+    body {
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .game-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100vw;
+    }
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-gap: 10px;
+        padding: 10px;
+        width: 90vw;
+    }
+
+    .scoreboard,
+    .leaderboard,
+    .how-to-play,
+    .footer {
+        width: 90vw;
+        margin: 10px auto;
+    }
+
+    .scoreboard {
+        font-size: 1rem;
+        padding: 10px;
+    }
+
+    button {
+        width: 100%;
+        font-size: 1rem;
+    }
+
+    .affiliate-box,
+    .audio-control {
+        width: 90vw;
+        text-align: center;
+    }
+}
+
+</style>
 </head>
 <body>
-    <!-- Device detection banner -->
-    <div class="device-banner" id="device-banner">
-        <i class="fas fa-mobile-alt" id="device-icon"></i>
-        <span id="device-text">Mobile View</span>
-    </div>
+    <!-- Affiliate box removed -->
     
     <!-- Sign-up overlay -->
     <div class="signup-container" id="signup-container">
@@ -931,7 +843,7 @@
                         <div class="leaderboard-score">8,650</div>
                     </div>
                     <div class="leaderboard-item">
-                        <div class="leaderboard-position">5</div>
+                        <div class="leaderboard-position">5</极>
                         <div class="leaderboard-name">Zinhle T.</div>
                         <div class="leaderboard-score">7,890</div>
                     </div>
@@ -1011,30 +923,6 @@
     </audio>
 
     <script>
-        // Device detection
-        function detectDevice() {
-            const deviceBanner = document.getElementById('device-banner');
-            const deviceText = document.getElementById('device-text');
-            const deviceIcon = document.getElementById('device-icon');
-            
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
-            if (isMobile) {
-                deviceText.textContent = 'Mobile View';
-                deviceIcon.className = 'fas fa-mobile-alt';
-                document.body.classList.add('mobile');
-            } else {
-                deviceText.textContent = 'Desktop View';
-                deviceIcon.className = 'fas fa-desktop';
-                document.body.classList.add('desktop');
-            }
-            
-            // Hide banner after 5 seconds
-            setTimeout(() => {
-                deviceBanner.classList.add('hidden');
-            }, 5000);
-        }
-        
         // Game elements
         const gameContainer = document.getElementById('game-container');
         const gameBoard = document.getElementById('game-board');
@@ -1050,7 +938,9 @@
         const signupForm = document.getElementById('signup-form');
         const usernameDisplay = document.getElementById('username-display');
         const monthDisplay = document.getElementById('month-display');
+        // Display for the monthly prize message
         const prizeMonthDisplay = document.getElementById('prize-month-display');
+        // Affiliate modal elements removed: linkModal, redirectButton, countdownElement
 
         // Sound elements and state
         const bgMusic = document.getElementById('bg-music');
@@ -1062,6 +952,7 @@
 
         // Initialize sound system
         function initSound() {
+            // Create an AudioContext for game sounds
             try {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 tapGain = audioCtx.createGain();
@@ -1070,6 +961,7 @@
             } catch (e) {
                 console.warn('Could not initialize audio context', e);
             }
+            // Set initial volume for background music
             bgMusic.volume = parseFloat(volumeSlider.value);
         }
 
@@ -1078,11 +970,13 @@
             soundEnabled = !soundEnabled;
             if (soundEnabled) {
                 soundToggleBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                // Resume background music if it was playing
                 if (bgMusic.paused && gameActive) {
                     bgMusic.play().catch(() => {});
                 }
             } else {
                 soundToggleBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                // Pause background music when muted
                 bgMusic.pause();
             }
         }
@@ -1093,6 +987,8 @@
             bgMusic.volume = vol;
             if (tapGain) tapGain.gain.value = vol * 0.5;
         }
+
+        // Affiliate links removed
 
         // Icon paths
         const imagePaths = [
@@ -1111,6 +1007,9 @@
         let spawnTimer;
         let currentUser = null;
 
+        // Leaderboard data will be stored locally. Each entry has { name, score }.
+        let leaderboardData = [];
+
         // Load leaderboard data from localStorage
         function loadLeaderboard() {
             const stored = localStorage.getItem('mzansi_leaderboard');
@@ -1126,9 +1025,11 @@
         function renderLeaderboard() {
             const list = document.getElementById('leaderboard');
             if (!list) return;
+            // Clear any existing children (including initial static markup)
             list.innerHTML = '';
             leaderboardData.forEach((entry, index) => {
                 const item = document.createElement('div');
+                // Highlight the top scorer
                 item.className = 'leaderboard-item' + (index === 0 ? ' winner' : '');
                 const pos = document.createElement('div');
                 pos.className = 'leaderboard-position';
@@ -1149,15 +1050,19 @@
         // Update or insert a score entry and re-render the leaderboard
         function updateLeaderboardEntry(name, newScore) {
             if (!name || name.trim() === '') name = 'Guest';
+            // Check if user already exists in the leaderboard
             const existing = leaderboardData.find(e => e.name === name);
             if (existing) {
+                // Replace only if the new score is higher
                 if (newScore > existing.score) {
                     existing.score = newScore;
                 }
             } else {
                 leaderboardData.push({ name: name, score: newScore });
             }
+            // Sort in descending order
             leaderboardData.sort((a, b) => b.score - a.score);
+            // Keep only top 5 entries
             leaderboardData = leaderboardData.slice(0, 5);
             saveLeaderboard();
             renderLeaderboard();
@@ -1230,6 +1135,7 @@
             gameTimer = setInterval(updateTimer, 1000);
             spawnTimer = setInterval(spawnIcon, 800);
 
+            // Start background music if sound is enabled
             if (soundEnabled) {
                 try {
                     bgMusic.currentTime = 0;
@@ -1247,6 +1153,7 @@
             clearInterval(spawnTimer);
             startButton.innerHTML = '<i class="fas fa-play"></i> Resume Game';
 
+            // Pause background music when the game is paused
             try {
                 bgMusic.pause();
             } catch (err) {}
@@ -1264,6 +1171,7 @@
             startButton.innerHTML = '<i class="fas fa-play"></i> Start Game';
             document.querySelectorAll('.game-cell.active').forEach(c => c.classList.remove('active'));
 
+            // Reset background music
             try {
                 bgMusic.pause();
                 bgMusic.currentTime = 0;
@@ -1294,11 +1202,13 @@
             gameOverScreen.classList.add('show');
             document.querySelectorAll('.game-cell.active').forEach(c => c.classList.remove('active'));
 
+            // Stop background music at game end
             try {
                 bgMusic.pause();
                 bgMusic.currentTime = 0;
             } catch (err) {}
 
+            // Update leaderboard with this game's score
             try {
                 const playerName = currentUser && currentUser.username ? currentUser.username : 'Guest';
                 updateLeaderboardEntry(playerName, score);
@@ -1314,7 +1224,9 @@
                 const osc = audioCtx.createOscillator();
                 const gainNode = audioCtx.createGain();
                 osc.type = 'square';
+                // Randomize frequency slightly for variation
                 osc.frequency.value = 400 + Math.random() * 200;
+                // Volume scaled by slider
                 gainNode.gain.value = parseFloat(volumeSlider.value) * 0.4;
                 osc.connect(gainNode);
                 gainNode.connect(audioCtx.destination);
@@ -1339,6 +1251,7 @@
                 year += 1;
             }
             monthDisplay.textContent = `${monthNames[monthIndex]} ${year}`;
+            // Also update the prize banner month if present
             if (prizeMonthDisplay) {
                 prizeMonthDisplay.textContent = `${monthNames[monthIndex]} ${year}`;
             }
@@ -1370,6 +1283,7 @@
             const username = document.getElementById('username').value.trim();
             const email = document.getElementById('email').value.trim();
             const phone = document.getElementById('phone').value.trim();
+            // Validate username: only letters and numbers, 1-8 characters
             const validUsername = /^[A-Za-z0-9]{1,8}$/.test(username);
             if (!validUsername) {
                 alert('Username must be 1 to 8 characters long and contain only letters and numbers. Please adjust your username.');
@@ -1384,10 +1298,11 @@
             alert(`Welcome to Mzansi Taps, ${username}! Good luck winning R100 in airtime this month!`);
         }
 
+        // Affiliate click handler removed
+
         // Initialize the game
         function initGame() {
-            // Detect device type and display banner
-            detectDevice();
+            // Affiliate link handling removed
             
             // Load stored leaderboard and render it
             loadLeaderboard();
@@ -1395,6 +1310,7 @@
 
             // Initialize sound system and controls
             initSound();
+            // Sound toggle and volume handlers
             if (soundToggleBtn) {
                 soundToggleBtn.addEventListener('click', toggleSound);
             }
@@ -1416,6 +1332,7 @@
             
             resetButton.addEventListener('click', resetGame);
 
+            // Bonus button click redirects to the bonus page
             const bonusButton = document.getElementById('bonus-btn');
             if (bonusButton) {
                 bonusButton.addEventListener('click', () => {
