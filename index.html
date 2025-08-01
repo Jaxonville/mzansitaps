@@ -1,859 +1,1002 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mzansi Taps - Mobile Game</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        :root {
-            --sa-blue: #002395;
-            --sa-green: #007749;
-            --sa-yellow: #ffb81c;
-            --sa-red: #de3831;
-            --gold: #ffd700;
-            --orange: #ff8c00;
-            --dark-bg: #0a0a14;
-        }
-        
-        body {
-            background: linear-gradient(135deg, var(--sa-blue), var(--sa-green), var(--sa-yellow), var(--sa-red));
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 15px;
-            color: white;
-            overflow-x: hidden;
-        }
-        
-        .game-container {
-            width: 100%;
-            max-width: 500px;
-            background: rgba(20, 20, 30, 0.95);
-            border-radius: 20px;
-            border: 4px solid var(--gold);
-            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.7);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: 95vh;
-            max-height: 850px;
-        }
-        
-        /* Header with Logo */
-        .header {
-            background: linear-gradient(to right, var(--sa-blue), var(--sa-green), var(--sa-yellow), var(--sa-red));
-            padding: 10px 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border-bottom: 3px solid var(--gold);
-            position: relative;
-        }
-        
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 10px;
-            animation: pulsate 2s infinite;
-        }
-        
-        .logo {
-            height: 60px;
-            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
-        }
-        
-        .stats {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-            justify-content: center;
-        }
-        
-        .stat-box {
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 8px;
-            padding: 6px 10px;
-            border: 2px solid var(--gold);
-            min-width: 70px;
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--gold);
-            text-shadow: 0 0 8px rgba(255, 165, 0, 0.8);
-        }
-        
-        .stat-label {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #ddd;
-        }
-        
-        /* Game Area */
-        .game-area {
-            padding: 15px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .game-title {
-            text-align: center;
-            margin-bottom: 10px;
-            color: var(--gold);
-            text-shadow: 0 0 8px rgba(255, 165, 0, 0.5);
-            font-size: 18px;
-        }
-        
-        .game-board {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(4, 1fr);
-            gap: 8px;
-            flex: 1;
-            background: rgba(30, 30, 50, 0.6);
-            border-radius: 12px;
-            padding: 10px;
-            border: 2px solid rgba(255, 215, 0, 0.3);
-        }
-        
-        .game-cell {
-            background: rgba(40, 40, 60, 0.8);
-            border-radius: 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 2px solid #444;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .game-cell:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
-        }
-        
-        .game-cell.active {
-            background: rgba(255, 215, 0, 0.15);
-            border-color: var(--orange);
-            animation: pulse 0.5s;
-        }
-        
-        .icon-image {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
-            transition: transform 0.3s ease, filter 0.3s ease;
-        }
-        
-        .game-cell.active .icon-image {
-            transform: scale(1.2);
-            filter: drop-shadow(0 0 6px rgba(255, 69, 0, 0.8));
-        }
-        
-        /* Controls */
-        .controls {
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            background: rgba(0, 0, 0, 0.4);
-            border-top: 3px solid var(--gold);
-        }
-        
-        .game-btn {
-            padding: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            border-radius: 50px;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            flex: 1;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-        }
-        
-        .btn-gold {
-            background: linear-gradient(to bottom, var(--gold), var(--orange));
-            color: #000;
-            box-shadow: 0 5px 15px rgba(255, 140, 0, 0.4);
-        }
-        
-        .btn-gold:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.6);
-        }
-        
-        .btn-outline {
-            background: transparent;
-            color: var(--gold);
-            border: 2px solid var(--gold);
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
-        }
-        
-        .btn-outline:hover {
-            background: rgba(255, 215, 0, 0.1);
-        }
-        
-        /* Info Bar */
-        .info-bar {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 15px;
-            background: rgba(15, 15, 25, 0.9);
-            border-top: 2px solid var(--gold);
-        }
-        
-        .info-btn {
-            padding: 8px 15px;
-            border-radius: 30px;
-            background: rgba(255, 215, 0, 0.1);
-            color: var(--gold);
-            border: 1px solid var(--gold);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        
-        /* Modals */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            display: flex;
-            flex-direction: column;
-            z-index: 100;
-            padding: 20px;
-            transform: translateY(100%);
-            transition: transform 0.4s ease;
-        }
-        
-        .modal.active {
-            transform: translateY(0);
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid var(--gold);
-        }
-        
-        .modal-title {
-            color: var(--gold);
-            font-size: 24px;
-        }
-        
-        .close-modal {
-            background: var(--gold);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            color: #000;
-            font-weight: bold;
-            font-size: 1.2rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal-content {
-            flex: 1;
-            overflow-y: auto;
-        }
-        
-        /* Leaderboard */
-        .leaderboard {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .leader-item {
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            background: rgba(50, 50, 70, 0.5);
-            border-radius: 8px;
-        }
-        
-        .leader-item.winner {
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-        }
-        
-        .position {
-            width: 30px;
-            height: 30px;
-            background: var(--gold);
-            color: #000;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            margin-right: 15px;
-            font-size: 16px;
-        }
-        
-        .leader-name {
-            flex: 1;
-            font-weight: 500;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-size: 16px;
-        }
-        
-        .leader-score {
-            font-weight: 700;
-            color: var(--gold);
-            font-size: 18px;
-        }
-        
-        .prize-info {
-            background: rgba(255, 215, 0, 0.1);
-            border-radius: 10px;
-            padding: 12px;
-            text-align: center;
-            margin: 15px 0;
-            color: var(--gold);
-            font-weight: 500;
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            font-size: 14px;
-        }
-        
-        /* Instructions */
-        .instructions p {
-            margin-bottom: 15px;
-            line-height: 1.5;
-            color: #ddd;
-            font-size: 16px;
-        }
-        
-        .icon-pair {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-        }
-        
-        .icon-container {
-            text-align: center;
-        }
-        
-        .icon-image {
-            width: 65px;
-            height: 65px;
-            margin: 0 auto 6px;
-            object-fit: contain;
-        }
-        
-        .icon-name {
-            font-size: 14px;
-            color: #ddd;
-        }
-        
-        /* Share Section */
-        .share-section {
-            text-align: center;
-            margin-top: 20px;
-        }
-        
-        .share-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .share-btn {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: linear-gradient(to bottom, var(--gold), var(--orange));
-            color: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .share-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(255, 140, 0, 0.4);
-        }
-        
-        /* Animations */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        @keyframes pulsate {
-            0% {
-                transform: scale(1);
-                filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
-            }
-            50% {
-                transform: scale(1.05);
-                filter: drop-shadow(0 0 15px rgba(255, 215, 0, 1));
-            }
-            100% {
-                transform: scale(1);
-                filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
-            }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mzansi Taps – Mobile</title>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    /* Colour palette matching the South African flag and gold accents */
+    :root {
+      --sa-blue: #002395;
+      --sa-green: #007749;
+      --sa-yellow: #ffb81c;
+      --sa-red: #de3831;
+      --gold: #ffd700;
+      --orange: #ff8c00;
+    }
+
+    /* Reset and base styling */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg,
+        rgba(0, 35, 149, 0.8),
+        rgba(0, 119, 73, 0.8),
+        rgba(255, 184, 28, 0.8),
+        rgba(222, 56, 49, 0.8)
+      );
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: 20px;
+      color: #fff;
+    }
+
+    /* Sign‑up overlay styling */
+    .signup-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+    }
+    .signup-box {
+      background: linear-gradient(135deg, var(--sa-blue), var(--sa-green));
+      border-radius: 16px;
+      padding: 30px;
+      width: 90%;
+      max-width: 420px;
+      text-align: center;
+      border: 3px solid var(--gold);
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+    }
+    .signup-box h2 {
+      color: var(--gold);
+      margin-bottom: 8px;
+      font-size: 1.7rem;
+    }
+    .signup-box p {
+      color: var(--gold);
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+    }
+    .signup-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--gold);
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 2px solid var(--gold);
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      font-size: 1rem;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: #ff4500;
+      box-shadow: 0 0 10px rgba(255, 69, 0, 0.5);
+    }
+    .signup-form button {
+      margin-top: 10px;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 30px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(to bottom, var(--gold), var(--orange));
+      color: #000;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+    .signup-form button:hover {
+      background: linear-gradient(to bottom, #ffc400, #ff7700);
+      box-shadow: 0 6px 20px rgba(255, 140, 0, 0.6);
+    }
+
+    /* Main game container: mobile portrait with 9:16 aspect ratio and scrollable info panel */
+    .game-container {
+      width: 100%;
+      max-width: 450px;
+      background: rgba(0, 0, 0, 0.85);
+      border-radius: 18px;
+      border: 4px solid var(--gold);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 100vh;
+    }
+    /* Header section */
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      background: linear-gradient(90deg, var(--sa-blue), var(--sa-green), var(--sa-yellow), var(--sa-red));
+      border-bottom: 3px solid var(--gold);
+    }
+    .logo {
+      width: 50px;
+      height: auto;
+      margin-right: 12px;
+      filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+    }
+    .stats-bar {
+      display: flex;
+      flex: 1;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 10px;
+      padding: 4px 10px;
+      border: 2px solid var(--gold);
+      gap: 10px;
+    }
+    .stat {
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 2px;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    /* Prize banner displays monthly prize info */
+    .prize-banner {
+      margin: 6px 12px 0 12px;
+      background: rgba(222, 56, 49, 0.3);
+      border: 1px solid #ff4500;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 0.75rem;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .prize-banner i {
+      margin-right: 4px;
+    }
+    /* Game area with 4x4 grid */
+    .game-area {
+      flex: 1;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+    }
+    .game-board {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .game-cell {
+      background: rgba(30, 30, 40, 0.8);
+      border-radius: 10px;
+      border: 2px solid #444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      overflow: hidden;
+    }
+    .game-cell:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+    }
+    .game-cell.active {
+      background: rgba(255, 215, 0, 0.15);
+      border-color: #ff4500;
+      animation: pulse 0.5s;
+    }
+    .icon-image {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      transition: transform 0.3s ease, filter 0.3s ease;
+    }
+    .game-cell.active .icon-image {
+      transform: scale(1.2);
+      filter: drop-shadow(0 0 6px rgba(255, 69, 0, 0.8));
+    }
+
+    /* Controls row */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+    }
+    .sound-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sound-toggle {
+      background: none;
+      border: none;
+      color: var(--gold);
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+    .sound-toggle:hover {
+      color: var(--orange);
+    }
+    .sound-controls input[type="range"] {
+      width: 100px;
+      height: 4px;
+      background: #444;
+      border-radius: 5px;
+      outline: none;
+      cursor: pointer;
+    }
+    .btn {
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 28px;
+      border: none;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-width: 140px;
+      transition: all 0.3s ease;
+    }
+    .btn-gold {
+      background: linear-gradient(to bottom, var(--gold), var(--orange));
+      color: #000;
+      box-shadow: 0 4px 12px rgba(255, 140, 0, 0.5);
+    }
+    .btn-gold:hover {
+      background: linear-gradient(to bottom, #ffc400, #ff7700);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(255, 140, 0, 0.7);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--gold);
+      border: 2px solid var(--gold);
+      box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+    }
+    .btn-outline:hover {
+      background: rgba(255, 215, 0, 0.1);
+      transform: translateY(-3px);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+    }
+
+    /* Scrollable info panel at the bottom */
+    .info-panel {
+      background: rgba(10, 10, 20, 0.9);
+      border-top: 3px solid var(--gold);
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      overflow-y: auto;
+      flex-shrink: 0;
+      max-height: 40vh;
+    }
+    .panel {
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 12px;
+      padding: 12px;
+      border: 2px solid #444;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-title {
+      color: #ff4500;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--gold);
+    }
+    .leaderboard-list {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      padding: 6px 8px;
+      background: rgba(0, 35, 149, 0.3);
+      border-radius: 8px;
+      margin-bottom: 4px;
+      border: 1px solid var(--gold);
+      font-size: 0.8rem;
+      color: white;
+    }
+    .leaderboard-item.winner {
+      background: linear-gradient(90deg, rgba(255, 184, 28, 0.3), rgba(222, 56, 49, 0.3));
+      border: 2px solid #ff4500;
+    }
+    .leaderboard-position {
+      width: 20px;
+      text-align: center;
+      font-weight: bold;
+      color: var(--gold);
+      font-size: 0.8rem;
+    }
+    .leaderboard-name {
+      flex: 1;
+      padding-left: 6px;
+      color: var(--gold);
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .leaderboard-score {
+      width: 60px;
+      text-align: right;
+      font-weight: bold;
+      color: var(--gold);
+      font-size: 0.8rem;
+    }
+    .instructions {
+      color: var(--gold);
+      line-height: 1.3;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+    .mzansi-icons {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .icon-card {
+      background: rgba(30, 30, 40, 0.8);
+      border-radius: 8px;
+      padding: 6px;
+      text-align: center;
+      border: 2px solid #444;
+    }
+    .icon-card .icon-image {
+      width: 50px;
+      height: 50px;
+      margin: 0 auto 4px;
+      object-fit: contain;
+    }
+    .icon-card .name {
+      color: var(--gold);
+      font-weight: 600;
+      font-size: 0.75rem;
+    }
+    .share-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .share-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(to bottom, var(--gold), var(--orange));
+      color: #000;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .share-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 12px rgba(255, 140, 0, 0.7);
+    }
+    /* Game over overlay */
+    .game-over {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .game-over.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .game-over h2 {
+      font-size: 2.2rem;
+      color: #ff4500;
+      margin-bottom: 10px;
+      animation: pulse 1.5s infinite;
+    }
+    .final-score {
+      font-size: 1.6rem;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    /* Custom scrollbars for leaderboard */
+    .leaderboard-list::-webkit-scrollbar { width: 6px; }
+    .leaderboard-list::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); border-radius: 10px; }
+    .leaderboard-list::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+  </style>
 </head>
 <body>
-    <div class="game-container">
-        <!-- Header with Logo -->
-        <div class="header">
-            <div class="logo-container">
-                <img src="https://ik.imagekit.io/wholesomety/logo.png" alt="Mzansi Taps Logo" class="logo">
-            </div>
-            <div class="stats">
-                <div class="stat-box">
-                    <div class="stat-value" id="score">0</div>
-                    <div class="stat-label">Score</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value" id="level">1</div>
-                    <div class="stat-label">Level</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value" id="timer">60</div>
-                    <div class="stat-label">Time</div>
-                </div>
-            </div>
+  <!-- Sign‑up overlay -->
+  <div class="signup-container" id="signup-container">
+    <div class="signup-box">
+      <h2><i class="fas fa-user-plus"></i> Sign Up &amp; Play</h2>
+      <p>Sign up for a chance to win R100 in airtime this month!</p>
+      <form class="signup-form" id="signup-form">
+        <div class="form-group">
+          <label for="username"><i class="fas fa-user"></i> Username</label>
+          <input id="username" type="text" placeholder="Enter your username" pattern="[A-Za-z0-9]{1,8}" maxlength="8" title="Username must be 1-8 characters long and contain only letters and numbers" required>
         </div>
-        
-        <!-- Game Area -->
-        <div class="game-area">
-            <h2 class="game-title">Tap South African Icons!</h2>
-            <div class="game-board" id="game-board">
-                <!-- Game cells will be generated by JavaScript -->
-            </div>
+        <div class="form-group">
+          <label for="email"><i class="fas fa-envelope"></i> Email</label>
+          <input id="email" type="email" placeholder="Enter your email" required>
         </div>
-        
-        <!-- Controls -->
-        <div class="controls">
-            <button class="game-btn btn-gold" id="start-btn">
-                <i class="fas fa-play"></i> Start
-            </button>
-            <button class="game-btn btn-outline" id="reset-btn">
-                <i class="fas fa-redo"></i> Reset
-            </button>
-            <button class="game-btn btn-gold" id="bonus-btn">
-                <i class="fas fa-gift"></i> Bonus
-            </button>
+        <div class="form-group">
+          <label for="phone"><i class="fas fa-phone"></i> Cell Phone</label>
+          <input id="phone" type="tel" placeholder="e.g. 0821234567" required>
         </div>
-        
-        <!-- Info Bar -->
-        <div class="info-bar">
-            <button class="info-btn" id="leaderboard-btn">
-                <i class="fas fa-trophy"></i> Leaderboard
-            </button>
-            <button class="info-btn" id="instructions-btn">
-                <i class="fas fa-info-circle"></i> How to Play
-            </button>
-        </div>
+        <button type="submit"><i class="fas fa-check"></i> Sign Up &amp; Play</button>
+      </form>
     </div>
-    
-    <!-- Leaderboard Modal -->
-    <div class="modal" id="leaderboard-modal">
-        <div class="modal-header">
-            <h2 class="modal-title">Monthly Leaderboard</h2>
-            <button class="close-modal">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="modal-content">
-            <div class="leaderboard">
-                <div class="leader-item winner">
-                    <div class="position">1</div>
-                    <div class="leader-name">tashirsa</div>
-                    <div class="leader-score">340</div>
-                </div>
-                <div class="leader-item">
-                    <div class="position">2</极>
-                    <div class="leader-name">wholesomety</div>
-                    <div class="leader-score">290</div>
-                </div>
-                <div class="leader-item">
-                    <div class="position">3</div>
-                    <div class="leader-name">tashirsattar21@gmail...</div>
-                    <div class="leader-score">120</div>
-                </div>
-            </div>
-            <div class="prize-info">
-                <i class="fas fa-gift"></i> Top scorer wins R100 airtime - September 2025
-            </div>
-            
-            <div class="share-section">
-                <h3>Share with Friends!</h3>
-                <p>Challenge your friends for the top spot</p>
-                <div class="share-buttons">
-                    <div class="share-btn">
-                        <i class="fab fa-facebook-f"></i>
-                    </div>
-                    <div class="share-btn">
-                        <i class="fab fa-twitter"></i>
-                    </div>
-                    <div class="share-btn">
-                        <i class="fab fa-whatsapp"></i>
-                    </div>
-                    <div class="share-btn">
-                        <i class="fas fa-link"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Instructions Modal -->
-    <div class="modal" id="instructions-modal">
-        <div class="modal-header">
-            <h2 class="modal-title">How to Play</h2>
-            <button class="close-modal">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="modal-content">
-            <div class="instructions">
-                <p>Tap the South African icons as they appear! You earn points for each successful tap.</p>
-                <p>Each level gets faster - be quick or you'll miss them! The game lasts for 60 seconds.</p>
-                
-                <div class="icon-pair">
-                    <div class="icon-container">
-                        <img src="https://ik.imagekit.io/wholesomety/tokoloshe.png" alt="Tokoloshe" class="icon-image">
-                        <div class="icon-name">Tokoloshe</div>
-                    </div>
-                    <div class="icon-container">
-                        <img src="https://ik.imagekit.io/wholesomety/slayqueen.png" alt="Slay Queen" class="icon-image">
-                        <div class="icon-name">Slay Queen</div>
-                    </div>
-                </div>
-                
-                <div class="icon-pair">
-                    <div class="icon-container">
-                        <img src="https://ik.imagekit.io/wholesomety/tikkop.png" alt="Tik Kop" class="icon-image">
-                        <div class="icon-name">Tik Kop</div>
-                    </div>
-                    <div class="icon-container">
-                        <img src="https://ik.imagekit.io/wholesomety/taxi.png" alt="Taxi" class="icon-image">
-                        <div class="icon-name">Taxi</div>
-                    </div>
-                </div>
-                
-                <div class="prize-info">
-                    <i class="fas fa-gift"></i> Top scorer this month wins R100 in airtime!
-                </div>
-            </div>
-        </div>
-    </div>
+  </div>
 
-    <!-- Sound elements -->
-    <audio id="bg-music" preload="auto" loop>
-        <source src="https://upload.wikimedia.org/wikipedia/commons/f/f7/John_Bartmann_-_07_-_African_Moon.ogg" type="audio/ogg">
+  <!-- Main game UI -->
+  <div class="game-container" id="game-container" style="display: none;">
+    <!-- Header with logo, stats and prize banner -->
+    <div class="header">
+      <img class="logo" src="https://ik.imagekit.io/wholesomety/logo.png" alt="Mzansi Taps Logo"/>
+      <div class="stats-bar">
+        <div class="stat">
+          <div class="stat-value" id="username-display">Guest</div>
+          <div class="stat-label">Player</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="score">0</div>
+          <div class="stat-label">Score</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="level">1</div>
+          <div class="stat-label">Level</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="timer">60</div>
+          <div class="stat-label">Time left</div>
+        </div>
+      </div>
+      <!-- Prize banner will be placed below the header for more space -->
+      
+    </div>
+    <!-- Monthly prize banner: full width message displayed below header -->
+    <div class="prize-banner" id="prize-banner">
+      <i class="fas fa-gift"></i>
+      <span>Top scorer this month wins R100 in airtime!</span>
+      <span id="prize-month-display"></span>
+    </div>
+    <!-- Game grid area -->
+    <div class="game-area">
+      <div class="game-board" id="game-board"></div>
+    </div>
+    <!-- Controls row -->
+    <div class="controls">
+      <button class="btn btn-gold" id="start-btn"><i class="fas fa-play"></i> Start Game</button>
+      <button class="btn btn-outline" id="reset-btn"><i class="fas fa-redo"></i> Reset Game</button>
+      <button class="btn btn-gold" id="bonus-btn"><i class="fas fa-gift"></i> Claim Bonus</button>
+      <div class="sound-controls">
+        <button class="sound-toggle" id="sound-toggle"><i class="fas fa-volume-up"></i></button>
+        <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5"/>
+      </div>
+    </div>
+    <!-- Scrollable info panel -->
+    <div class="info-panel">
+      <div class="panel">
+        <div class="panel-title"><i class="fas fa-trophy"></i> Monthly Leaderboard</div>
+        <div class="leaderboard-list" id="leaderboard"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title"><i class="fas fa-info-circle"></i> How to Play</div>
+        <div class="instructions">
+          <p>Tap the South African icons as they appear! You earn points for each successful tap. Each level gets faster – be quick or you'll miss them! The game lasts for 60 seconds.</p>
+          <div class="mzansi-icons">
+            <div class="icon-card"><img class="icon-image" src="https://ik.imagekit.io/wholesomety/tokoloshe.png" alt="Tokoloshe"/><div class="name">Tokoloshe</div></div>
+            <div class="icon-card"><img class="icon-image" src="https://ik.imagekit.io/wholesomety/slayqueen.png" alt="Slay Queen"/><div class="name">Slay Queen</div></div>
+            <div class="icon-card"><img class="icon-image" src="https://ik.imagekit.io/wholesomety/tikkop.png" alt="Tik Kop"/><div class="name">Tik Kop</div></div>
+            <div class="icon-card"><img class="icon-image" src="https://ik.imagekit.io/wholesomety/taxi.png" alt="Taxi"/><div class="name">Taxi</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title"><i class="fas fa-share-alt"></i> Share with Friends!</div>
+        <div class="instructions">Challenge your friends for the top spot</div>
+        <div class="share-buttons">
+          <div class="share-btn" onclick="shareOnFacebook()"><i class="fab fa-facebook-f"></i></div>
+          <div class="share-btn" onclick="shareOnTwitter()"><i class="fab fa-twitter"></i></div>
+          <div class="share-btn" onclick="shareOnWhatsApp()"><i class="fab fa-whatsapp"></i></div>
+          <div class="share-btn" onclick="copyGameLink()"><i class="fas fa-link"></i></div>
+        </div>
+      </div>
+    </div>
+    <!-- Game over overlay -->
+    <div class="game-over" id="game-over">
+      <h2>Game Over</h2>
+      <p class="final-score" id="final-score">0</p>
+      <button class="btn btn-gold" id="play-again"><i class="fas fa-redo"></i> Play Again</button>
+    </div>
+    <!-- Background music
+         The primary source uses a CC0 track hosted on Wikimedia Commons. A local
+         fallback is provided for offline use. -->
+    <audio id="bg-music" loop preload="auto">
+      <!-- Background music: John Bartmann – African Moon (CC0). The first source is an ogg file
+           hosted on Wikimedia Commons. The second is an MP3 mirror on Chosic. -->
+      <source src="https://upload.wikimedia.org/wikipedia/commons/f/f7/John_Bartmann_-_07_-_African_Moon.ogg" type="audio/ogg">
+      <source src="https://www.chosic.com/wp-content/uploads/2020/06/John_Bartmann_-_07_-_African_Moon(chosic.com).mp3" type="audio/mpeg">
     </audio>
-    <audio id="tap-sound" preload="auto">
-        <source src="https://www.soundjay.com/buttons/sounds/button-09.mp3" type="audio/mpeg">
-    </audio>
+  </div>
 
-    <script>
-        // Game elements
-        const gameBoard = document.getElementById('game-board');
-        const scoreElement = document.getElementById('score');
-        const levelElement = document.getElementById('level');
-        const timerElement = document.getElementById('timer');
-        const startButton = document.getElementById('start-btn');
-        const resetButton = document.getElementById('reset-btn');
-        const bonusButton = document.getElementById('bonus-btn');
-        
-        // Modal elements
-        const leaderboardBtn = document.getElementById('leaderboard-btn');
-        const instructionsBtn = document.getElementById('instructions-btn');
-        const leaderboardModal = document.getElementById('leaderboard-modal');
-        const instructionsModal = document.getElementById('instructions-modal');
-        const closeButtons = document.querySelectorAll('.close-modal');
-        
-        // Sound elements
-        const bgMusic = document.getElementById('bg-music');
-        const tapSound = document.getElementById('tap-sound');
-        let soundEnabled = true;
-        
-        // Game state
-        let score = 0;
-        let level = 1;
-        let timeLeft = 60;
-        let gameActive = false;
-        let gameTimer;
-        let spawnTimer;
-        
-        // Icons for the game
-        const icons = [
-            'https://ik.imagekit.io/wholesomety/tokoloshe.png',
-            'https://ik.imagekit.io/wholesomety/slayqueen.png',
-            'https://ik.imagekit.io/wholesomety/tikkop.png',
-            'https://ik.imagekit.io/wholesomety/taxi.png'
-        ];
-        
-        // Initialize the game board
-        function initializeBoard() {
-            gameBoard.innerHTML = '';
-            for (let i = 0; i < 16; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'game-cell';
-                cell.dataset.index = i;
-                
-                const img = document.createElement('img');
-                img.className = 'icon-image';
-                img.alt = 'Mzansi Icon';
-                img.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"></svg>';
-                
-                cell.appendChild(img);
-                cell.addEventListener('click', () => handleCellClick(i));
-                gameBoard.appendChild(cell);
-            }
+  <!-- Game logic -->
+  <script>
+    // Select DOM elements
+    const gameContainer = document.getElementById('game-container');
+    const gameBoard = document.getElementById('game-board');
+    const scoreElement = document.getElementById('score');
+    const levelElement = document.getElementById('level');
+    const timerElement = document.getElementById('timer');
+    const startButton = document.getElementById('start-btn');
+    const resetButton = document.getElementById('reset-btn');
+    const gameOverScreen = document.getElementById('game-over');
+    const finalScoreElement = document.getElementById('final-score');
+    const playAgainButton = document.getElementById('play-again');
+    const signupContainer = document.getElementById('signup-container');
+    const signupForm = document.getElementById('signup-form');
+    const usernameDisplay = document.getElementById('username-display');
+    const monthDisplay = document.getElementById('prize-month-display');
+    // Prize month span (same as monthDisplay)
+    const prizeMonthDisplay = document.getElementById('prize-month-display');
+    // Sound elements
+    const bgMusic = document.getElementById('bg-music');
+    const soundToggleBtn = document.getElementById('sound-toggle');
+    const volumeSlider = document.getElementById('volume-slider');
+    let soundEnabled = true;
+    let audioCtx;
+    let tapGain;
+
+    // Local leaderboard data
+    let leaderboardData = [];
+
+    // Game state variables
+    let score = 0;
+    let level = 1;
+    let timeLeft = 60;
+    let gameActive = false;
+    let gameTimer;
+    let spawnTimer;
+    let currentUser = null;
+
+    // Image paths for icons
+    const imagePaths = [
+      'https://ik.imagekit.io/wholesomety/tokoloshe.png',
+      'https://ik.imagekit.io/wholesomety/slayqueen.png',
+      'https://ik.imagekit.io/wholesomety/tikkop.png',
+      'https://ik.imagekit.io/wholesomety/taxi.png'
+    ];
+
+    // ===== Audio setup =====
+    function initSound() {
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        tapGain = audioCtx.createGain();
+        tapGain.gain.value = parseFloat(volumeSlider.value) * 0.5;
+        tapGain.connect(audioCtx.destination);
+      } catch (e) {
+        console.warn('Could not initialize audio context', e);
+      }
+      bgMusic.volume = parseFloat(volumeSlider.value);
+    }
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      if (soundEnabled) {
+        soundToggleBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+        if (!bgMusic.paused && gameActive) {
+          bgMusic.play().catch(() => {});
         }
-        
-        // Handle cell click
-        function handleCellClick(index) {
-            if (!gameActive) return;
-            
-            const cell = gameBoard.children[index];
-            if (cell.classList.contains('active')) {
-                cell.classList.remove('active');
-                score += level * 10;
-                scoreElement.textContent = score;
-                
-                // Play tap sound
-                playTapSound();
-                
-                // Visual feedback
-                cell.style.backgroundColor = 'rgba(255, 215, 0, 0.3)';
-                setTimeout(() => {
-                    cell.style.backgroundColor = '';
-                }, 300);
-            }
+      } else {
+        soundToggleBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+        bgMusic.pause();
+      }
+    }
+    function updateVolume() {
+      const vol = parseFloat(volumeSlider.value);
+      bgMusic.volume = vol;
+      if (tapGain) tapGain.gain.value = vol * 0.5;
+    }
+    function playTapSound() {
+      if (!soundEnabled || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.value = 400 + Math.random() * 200;
+        gainNode.gain.value = parseFloat(volumeSlider.value) * 0.4;
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.1);
+      } catch (e) {
+        console.warn('Audio error:', e);
+      }
+    }
+
+    // Play a short tone when the game starts
+    function playStartSound() {
+      if (!soundEnabled || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = 600; // higher pitch for start
+        gainNode.gain.value = parseFloat(volumeSlider.value) * 0.4;
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+      } catch (e) {
+        console.warn('Audio error:', e);
+      }
+    }
+    // Play a tone when the game is reset
+    function playResetSound() {
+      if (!soundEnabled || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.value = 300; // lower pitch for reset
+        gainNode.gain.value = parseFloat(volumeSlider.value) * 0.4;
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.2);
+      } catch (e) {
+        console.warn('Audio error:', e);
+      }
+    }
+    // Play a descending tone when the game ends
+    function playGameOverSound() {
+      if (!soundEnabled || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.5);
+        gainNode.gain.setValueAtTime(parseFloat(volumeSlider.value) * 0.4, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.5);
+      } catch (e) {
+        console.warn('Audio error:', e);
+      }
+    }
+
+    // ===== Leaderboard storage =====
+    function loadLeaderboard() {
+      const stored = localStorage.getItem('mzansi_leaderboard');
+      leaderboardData = stored ? JSON.parse(stored) : [];
+    }
+    function saveLeaderboard() {
+      localStorage.setItem('mzansi_leaderboard', JSON.stringify(leaderboardData));
+    }
+    function renderLeaderboard() {
+      const list = document.getElementById('leaderboard');
+      if (!list) return;
+      list.innerHTML = '';
+      leaderboardData.forEach((entry, index) => {
+        const item = document.createElement('div');
+        item.className = 'leaderboard-item' + (index === 0 ? ' winner' : '');
+        const pos = document.createElement('div');
+        pos.className = 'leaderboard-position';
+        pos.textContent = index + 1;
+        const name = document.createElement('div');
+        name.className = 'leaderboard-name';
+        name.textContent = entry.name;
+        const scoreEl = document.createElement('div');
+        scoreEl.className = 'leaderboard-score';
+        scoreEl.textContent = entry.score;
+        item.appendChild(pos);
+        item.appendChild(name);
+        item.appendChild(scoreEl);
+        list.appendChild(item);
+      });
+    }
+    function updateLeaderboardEntry(name, newScore) {
+      if (!name || name.trim() === '') name = 'Guest';
+      const existing = leaderboardData.find(e => e.name === name);
+      if (existing) {
+        if (newScore > existing.score) {
+          existing.score = newScore;
         }
-        
-        // Play tap sound
-        function playTapSound() {
-            if (!soundEnabled) return;
-            tapSound.currentTime = 0;
-            tapSound.play().catch(e => console.log("Sound play error:", e));
+      } else {
+        leaderboardData.push({ name: name, score: newScore });
+      }
+      leaderboardData.sort((a, b) => b.score - a.score);
+      leaderboardData = leaderboardData.slice(0, 5);
+      saveLeaderboard();
+      renderLeaderboard();
+    }
+
+    // ===== Board setup and gameplay =====
+    function initializeBoard() {
+      gameBoard.innerHTML = '';
+      for (let i = 0; i < 16; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'game-cell';
+        cell.dataset.index = i;
+        const img = document.createElement('img');
+        img.className = 'icon-image';
+        img.alt = 'Mzansi Icon';
+        img.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"></svg>';
+        cell.appendChild(img);
+        cell.addEventListener('click', handleCellClick);
+        gameBoard.appendChild(cell);
+      }
+    }
+    function handleCellClick(e) {
+      if (!gameActive) return;
+      const cell = e.currentTarget;
+      if (cell.classList.contains('active')) {
+        cell.classList.remove('active');
+        score += level * 10;
+        scoreElement.textContent = score;
+        playTapSound();
+        cell.style.backgroundColor = 'rgba(255, 215, 0, 0.3)';
+        setTimeout(() => { cell.style.backgroundColor = ''; }, 250);
+      }
+    }
+    function spawnIcon() {
+      if (!gameActive) return;
+      // Clear existing active cells
+      document.querySelectorAll('.game-cell.active').forEach(c => c.classList.remove('active'));
+      const cells = document.querySelectorAll('.game-cell');
+      if (!cells.length) return;
+      const randomIndex = Math.floor(Math.random() * cells.length);
+      const randomCell = cells[randomIndex];
+      const imageIndex = Math.floor(Math.random() * imagePaths.length);
+      const img = randomCell.querySelector('.icon-image');
+      img.src = imagePaths[imageIndex];
+      randomCell.classList.add('active');
+      const duration = Math.max(300, 900 - level * 100);
+      setTimeout(() => { randomCell.classList.remove('active'); }, duration);
+    }
+    function startGame() {
+      if (gameActive) return;
+      gameActive = true;
+      score = 0;
+      level = 1;
+      timeLeft = 60;
+      scoreElement.textContent = score;
+      levelElement.textContent = level;
+      timerElement.textContent = timeLeft;
+      startButton.innerHTML = '<i class="fas fa-pause"></i> Pause Game';
+      gameOverScreen.classList.remove('show');
+      gameTimer = setInterval(updateTimer, 1000);
+      spawnTimer = setInterval(spawnIcon, 800);
+      if (soundEnabled) {
+        // Play a short start sound
+        playStartSound();
+        try {
+          bgMusic.currentTime = 0;
+          bgMusic.play().catch(() => {});
+        } catch (err) {
+          console.warn('Error playing background music', err);
         }
-        
-        // Spawn an icon
-        function spawnIcon() {
-            if (!gameActive) return;
-            
-            // Remove any active icons
-            const activeCells = document.querySelectorAll('.game-cell.active');
-            activeCells.forEach(cell => cell.classList.remove('active'));
-            
-            // Select a random cell
-            const cells = document.querySelectorAll('.game-cell');
-            if (!cells.length) return;
-            
-            const randomIndex = Math.floor(Math.random() * cells.length);
-            const randomCell = cells[randomIndex];
-            
-            // Set a random icon
-            const iconIndex = Math.floor(Math.random() * icons.length);
-            const img = randomCell.querySelector('img');
-            img.src = icons[iconIndex];
-            
-            // Activate the cell
-            randomCell.classList.add('active');
-            
-            // Set timeout to remove the icon
-            const duration = Math.max(300, 900 - level * 100);
-            setTimeout(() => {
-                if (randomCell.classList.contains('active')) {
-                    randomCell.classList.remove('active');
-                }
-            }, duration);
+      }
+    }
+    function pauseGame() {
+      gameActive = false;
+      clearInterval(gameTimer);
+      clearInterval(spawnTimer);
+      startButton.innerHTML = '<i class="fas fa-play"></i> Resume Game';
+      try { bgMusic.pause(); } catch (err) {}
+    }
+    function resetGame() {
+      pauseGame();
+      score = 0;
+      level = 1;
+      timeLeft = 60;
+      scoreElement.textContent = score;
+      levelElement.textContent = level;
+      timerElement.textContent = timeLeft;
+      startButton.innerHTML = '<i class="fas fa-play"></i> Start Game';
+      document.querySelectorAll('.game-cell.active').forEach(c => c.classList.remove('active'));
+      try { bgMusic.pause(); bgMusic.currentTime = 0; } catch (err) {}
+      // Play reset sound
+      playResetSound();
+    }
+    function updateTimer() {
+      timeLeft--;
+      timerElement.textContent = timeLeft;
+      if (timeLeft > 0 && timeLeft % 15 === 0) {
+        level++;
+        levelElement.textContent = level;
+        clearInterval(spawnTimer);
+        spawnTimer = setInterval(spawnIcon, Math.max(300, 800 - level * 80));
+      }
+      if (timeLeft <= 0) {
+        endGame();
+      }
+    }
+    function endGame() {
+      gameActive = false;
+      clearInterval(gameTimer);
+      clearInterval(spawnTimer);
+      finalScoreElement.textContent = score;
+      gameOverScreen.classList.add('show');
+      document.querySelectorAll('.game-cell.active').forEach(c => c.classList.remove('active'));
+      try { bgMusic.pause(); bgMusic.currentTime = 0; } catch (err) {}
+      // Play game-over sound
+      playGameOverSound();
+      try {
+        const playerName = currentUser && currentUser.username ? currentUser.username : 'Guest';
+        updateLeaderboardEntry(playerName, score);
+      } catch (err) {
+        console.warn('Failed to update leaderboard', err);
+      }
+    }
+
+    // ===== Social sharing =====
+    function shareOnFacebook() {
+      const url = encodeURIComponent(window.location.href);
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+    }
+    function shareOnTwitter() {
+      const text = encodeURIComponent('Check out Mzansi Taps – the ultimate South African tapping game!');
+      const url = encodeURIComponent(window.location.href);
+      window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+    }
+    function shareOnWhatsApp() {
+      const text = encodeURIComponent('Play Mzansi Taps with me! Can you beat my score? ');
+      const url = encodeURIComponent(window.location.href);
+      window.open(`https://api.whatsapp.com/send?text=${text}${url}`, '_blank');
+    }
+    function copyGameLink() {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Game link copied to clipboard!');
+    }
+
+    // ===== Sign‑up handling =====
+    function handleSignup(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const validUsername = /^[A-Za-z0-9]{1,8}$/.test(username);
+      if (!validUsername) {
+        alert('Username must be 1 to 8 characters long and contain only letters and numbers. Please adjust your username.');
+        return;
+      }
+      currentUser = { username, email, phone, signupDate: new Date() };
+      usernameDisplay.textContent = username || 'Guest';
+      signupContainer.style.display = 'none';
+      gameContainer.style.display = 'flex';
+      initializeBoard();
+      setMonthDisplay();
+      alert(`Welcome to Mzansi Taps, ${username}! Good luck winning R100 in airtime this month!`);
+    }
+
+    // ===== Month display =====
+    function setMonthDisplay() {
+      const monthNames = [
+        'January','February','March','April','May','June',
+        'July','August','September','October','November','December'
+      ];
+      const now = new Date();
+      // Display next month for the prize period
+      let monthIndex = now.getMonth() + 1;
+      let year = now.getFullYear();
+      if (monthIndex > 11) {
+        monthIndex = 0;
+        year += 1;
+      }
+      const monthText = `${monthNames[monthIndex]} ${year}`;
+      if (monthDisplay) monthDisplay.textContent = monthText;
+      if (prizeMonthDisplay) prizeMonthDisplay.textContent = monthText;
+    }
+
+    // ===== Init game =====
+    function initGame() {
+      // Load and render leaderboard
+      loadLeaderboard();
+      renderLeaderboard();
+      // Setup audio
+      initSound();
+      soundToggleBtn.addEventListener('click', toggleSound);
+      volumeSlider.addEventListener('input', updateVolume);
+      // Signup event
+      signupForm.addEventListener('submit', handleSignup);
+      // Control buttons
+      startButton.addEventListener('click', () => {
+        if (gameActive) {
+          pauseGame();
+        } else {
+          startGame();
         }
-        
-        // Start the game
-        function startGame() {
-            if (gameActive) return;
-            
-            gameActive = true;
-            score = 0;
-            level = 1;
-            timeLeft = 60;
-            
-            scoreElement.textContent = score;
-            levelElement.textContent = level;
-            timerElement.textContent = timeLeft;
-            
-            startButton.innerHTML = '<i class="fas fa-pause"></i> Pause';
-            
-            // Start background music
-            if (soundEnabled) {
-                bgMusic.volume = 0.5;
-                bgMusic.play().catch(e => console.log("Music play error:", e));
-            }
-            
-            // Start timers
-            gameTimer = setInterval(updateTimer, 1000);
-            spawnTimer = setInterval(spawnIcon, 800);
-        }
-        
-        // Update timer
-        function updateTimer() {
-            timeLeft--;
-            timerElement.textContent = timeLeft;
-            
-            // Increase level every 15 seconds
-            if (timeLeft > 0 && timeLeft % 15 === 0) {
-                level++;
-                levelElement.textContent = level;
-                
-                // Increase game speed
-                clearInterval(spawnTimer);
-                spawnTimer = setInterval(spawnIcon, Math.max(300, 800 - level * 80));
-            }
-            
-            // End game when time runs out
-            if (timeLeft <= 0) {
-                endGame();
-            }
-        }
-        
-        // End game
-        function endGame() {
-            gameActive = false;
-            clearInterval(gameTimer);
-            clearInterval(spawnTimer);
-            
-            startButton.innerHTML = '<i class="fas fa-play"></i> Start';
-            
-            // Stop background music
-            bgMusic.pause();
-            bgMusic.currentTime = 0;
-            
-            // Show final score
-            setTimeout(() => {
-                alert(`Game Over!\nYour final score: ${score}`);
-            }, 500);
-        }
-        
-        // Reset game
-        function resetGame() {
-            gameActive = false;
-            clearInterval(gameTimer);
-            clearInterval(spawnTimer);
-            
-            score = 0;
-            level = 1;
-            timeLeft = 60;
-            
-            scoreElement.textContent = score;
-            levelElement.textContent = level;
-            timerElement.textContent = timeLeft;
-            
-            startButton.innerHTML = '<i class="fas fa-play"></i> Start';
-            
-            // Stop background music
-            bgMusic.pause();
-            bgMusic.currentTime = 0;
-            
-            // Clear active cells
-            const activeCells = document.querySelectorAll('.game-cell.active');
-            activeCells.forEach(cell => cell.classList.remove('active'));
-        }
-        
-        // Modal functions
-        function openModal(modal) {
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-        
-        function closeModals() {
-            leaderboardModal.classList.remove('active');
-            instructionsModal.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-        
-        // Initialize the game
-        function initGame() {
-            initializeBoard();
-            
-            // Event listeners
-            startButton.addEventListener('click', () => {
-                if (gameActive) {
-                    endGame();
-                } else {
-                    startGame();
-                }
-            });
-            
-            resetButton.addEventListener('click', resetGame);
-            
-            // Bonus button with working link
-            bonusButton.addEventListener('click', () => {
-                window.open('https://bio.site/wholesomety', '_blank');
-            });
-            
-            // Modal events
-            leaderboardBtn.addEventListener('click', () => openModal(leaderboardModal));
-            instructionsBtn.addEventListener('click', () => openModal(instructionsModal));
-            closeButtons.forEach(btn => {
-                btn.addEventListener('click', closeModals);
-            });
-            
-            // Close modals when clicking outside content
-            [leaderboardModal, instructionsModal].forEach(modal => {
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        closeModals();
-                    }
-                });
-            });
-        }
-        
-        window.addEventListener('DOMContentLoaded', initGame);
-    </script>
+      });
+      resetButton.addEventListener('click', resetGame);
+      // Bonus button to external link
+      const bonusButton = document.getElementById('bonus-btn');
+      if (bonusButton) {
+        bonusButton.addEventListener('click', () => {
+          window.open('https://bio.site/wholesomety', '_blank');
+        });
+      }
+      playAgainButton.addEventListener('click', () => {
+        gameOverScreen.classList.remove('show');
+        startGame();
+      });
+    }
+    window.addEventListener('DOMContentLoaded', initGame);
+  </script>
 </body>
 </html>
