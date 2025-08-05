@@ -16,7 +16,6 @@
       --gold: #ffd700;
       --orange: #ff8c00;
     }
-
     /* Reset and base styling */
     * {
       margin: 0;
@@ -40,7 +39,6 @@
       padding: 20px;
       color: #fff;
     }
-
     /* Sign‑up overlay styling */
     .signup-container {
       position: fixed;
@@ -123,7 +121,6 @@
       background: linear-gradient(to bottom, #ffc400, #ff7700);
       box-shadow: 0 6px 20px rgba(255, 140, 0, 0.6);
     }
-
     /* Main game container: mobile portrait with 9:16 aspect ratio and scrollable info panel */
     .game-container {
       width: 100%;
@@ -237,7 +234,6 @@
       transform: scale(1.2);
       filter: drop-shadow(0 0 6px rgba(255, 69, 0, 0.8));
     }
-
     /* Controls row */
     .controls {
       display: flex;
@@ -308,7 +304,6 @@
       transform: translateY(-3px);
       box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
     }
-
     /* Scrollable info panel at the bottom */
     .info-panel {
       background: rgba(10, 10, 20, 0.9);
@@ -500,12 +495,11 @@
       </form>
     </div>
   </div>
-
   <!-- Main game UI -->
   <div class="game-container" id="game-container" style="display: none;">
     <!-- Header with logo, stats and prize banner -->
     <div class="header">
-      <img class="logo" src="https://ik.imagekit.io/wholesomety/logo.png" alt="Mzansi Taps Logo"/>
+      <img class="logo" src="https://ik.imagekit.io/wholesomety/logo.png?updatedAt=1753830828856" alt="Mzansi Taps Logo"/>
       <div class="stats-bar">
         <div class="stat">
           <div class="stat-value" id="username-display">Guest</div>
@@ -558,10 +552,22 @@
         <div class="instructions">
           <p>Tap the South African icons as they appear! You earn points for each successful tap. Each level gets faster – be quick or you'll miss them! The game lasts for 60 seconds.</p>
           <div class="mzansi-icons">
-            <div class="icon-card"><img class="icon-image" src="https://ik.imagekit.io/wholesomety/tokoloshe.png" alt="Tokoloshe"/><div class="name">Tokoloshe</div></div>
-            <div class="icon-card"><img class="icon-image" src="https://ik.imagekit.io/wholesomety/slayqueen.png" alt="Slay Queen"/><div class="name">Slay Queen</div></div>
-            <div class="icon-card"><img class="icon-image" src="https://ik.imagekit.io/wholesomety/tikkop.png" alt="Tik Kop"/><div class="name">Tik Kop</div></div>
-            <div class="icon-card"><img class="icon-image" src="https://ik.imagekit.io/wholesomety/taxi.png" alt="Taxi"/><div class="name">Taxi</div></div>
+            <div class="icon-card">
+              <img class="icon-image" src="https://ik.imagekit.io/wholesomety/tokoloshe.png?updatedAt=1753831031224" alt="Tokoloshe"/>
+              <div class="name">Tokoloshe</div>
+            </div>
+            <div class="icon-card">
+              <img class="icon-image" src="https://ik.imagekit.io/wholesomety/slayqueen.png?updatedAt=1753830828431" alt="Slay Queen"/>
+              <div class="name">Slay Queen</div>
+            </div>
+            <div class="icon-card">
+              <img class="icon-image" src="https://ik.imagekit.io/wholesomety/tikkop.png?updatedAt=1753830830786" alt="Tik Kop"/>
+              <div class="name">Tik Kop</div>
+            </div>
+            <div class="icon-card">
+              <img class="icon-image" src="https://ik.imagekit.io/wholesomety/taxi.png?updatedAt=1753830830630" alt="Taxi"/>
+              <div class="name">Taxi</div>
+            </div>
           </div>
         </div>
       </div>
@@ -592,7 +598,6 @@
       <source src="https://www.chosic.com/wp-content/uploads/2020/06/John_Bartmann_-_07_-_African_Moon(chosic.com).mp3" type="audio/mpeg">
     </audio>
   </div>
-
   <!-- Game logic -->
   <script>
     // Select DOM elements
@@ -619,10 +624,8 @@
     let soundEnabled = true;
     let audioCtx;
     let tapGain;
-
     // Local leaderboard data
     let leaderboardData = [];
-
     // Game state variables
     let score = 0;
     let level = 1;
@@ -631,15 +634,13 @@
     let gameTimer;
     let spawnTimer;
     let currentUser = null;
-
-    // Image paths for icons
+    // Image paths for icons - using the provided ImageKit URLs
     const imagePaths = [
-      'https://ik.imagekit.io/wholesomety/tokoloshe.png',
-      'https://ik.imagekit.io/wholesomety/slayqueen.png',
-      'https://ik.imagekit.io/wholesomety/tikkop.png',
-      'https://ik.imagekit.io/wholesomety/taxi.png'
+      'https://ik.imagekit.io/wholesomety/tokoloshe.png?updatedAt=1753831031224',
+      'https://ik.imagekit.io/wholesomety/slayqueen.png?updatedAt=1753830828431',
+      'https://ik.imagekit.io/wholesomety/tikkop.png?updatedAt=1753830830786',
+      'https://ik.imagekit.io/wholesomety/taxi.png?updatedAt=1753830830630'
     ];
-
     // ===== Audio setup =====
     function initSound() {
       try {
@@ -685,7 +686,6 @@
         console.warn('Audio error:', e);
       }
     }
-
     // Play a short tone when the game starts
     function playStartSound() {
       if (!soundEnabled || !audioCtx) return;
@@ -739,7 +739,6 @@
         console.warn('Audio error:', e);
       }
     }
-
     // ===== Leaderboard storage =====
     function loadLeaderboard() {
       const stored = localStorage.getItem('mzansi_leaderboard');
@@ -785,7 +784,15 @@
       saveLeaderboard();
       renderLeaderboard();
     }
-
+    // ===== Player data storage =====
+    function savePlayerData(playerData) {
+      localStorage.setItem('mzansi_player', JSON.stringify(playerData));
+    }
+    
+    function loadPlayerData() {
+      const stored = localStorage.getItem('mzansi_player');
+      return stored ? JSON.parse(stored) : null;
+    }
     // ===== Board setup and gameplay =====
     function initializeBoard() {
       gameBoard.innerHTML = '';
@@ -904,7 +911,6 @@
         console.warn('Failed to update leaderboard', err);
       }
     }
-
     // ===== Social sharing =====
     function shareOnFacebook() {
       const url = encodeURIComponent(window.location.href);
@@ -924,7 +930,6 @@
       navigator.clipboard.writeText(window.location.href);
       alert('Game link copied to clipboard!');
     }
-
     // ===== Sign‑up handling =====
     function handleSignup(e) {
       e.preventDefault();
@@ -936,7 +941,19 @@
         alert('Username must be 1 to 8 characters long and contain only letters and numbers. Please adjust your username.');
         return;
       }
-      currentUser = { username, email, phone, signupDate: new Date() };
+      
+      // Create and save player data
+      const playerData = {
+        username: username,
+        email: email,
+        phone: phone,
+        signupDate: new Date().toISOString()
+      };
+      
+      // Save player data to localStorage
+      savePlayerData(playerData);
+      
+      currentUser = playerData;
       usernameDisplay.textContent = username || 'Guest';
       signupContainer.style.display = 'none';
       gameContainer.style.display = 'flex';
@@ -944,7 +961,6 @@
       setMonthDisplay();
       alert(`Welcome to Mzansi Taps, ${username}! Good luck winning R100 in airtime this month!`);
     }
-
     // ===== Month display =====
     function setMonthDisplay() {
       const monthNames = [
@@ -963,18 +979,31 @@
       if (monthDisplay) monthDisplay.textContent = monthText;
       if (prizeMonthDisplay) prizeMonthDisplay.textContent = monthText;
     }
-
     // ===== Init game =====
     function initGame() {
+      // Check if player data exists in localStorage
+      const savedPlayer = loadPlayerData();
+      if (savedPlayer) {
+        currentUser = savedPlayer;
+        usernameDisplay.textContent = savedPlayer.username || 'Guest';
+        signupContainer.style.display = 'none';
+        gameContainer.style.display = 'flex';
+        initializeBoard();
+        setMonthDisplay();
+      }
+      
       // Load and render leaderboard
       loadLeaderboard();
       renderLeaderboard();
+      
       // Setup audio
       initSound();
       soundToggleBtn.addEventListener('click', toggleSound);
       volumeSlider.addEventListener('input', updateVolume);
+      
       // Signup event
       signupForm.addEventListener('submit', handleSignup);
+      
       // Control buttons
       startButton.addEventListener('click', () => {
         if (gameActive) {
@@ -983,7 +1012,9 @@
           startGame();
         }
       });
+      
       resetButton.addEventListener('click', resetGame);
+      
       // Bonus button to external link
       const bonusButton = document.getElementById('bonus-btn');
       if (bonusButton) {
@@ -991,6 +1022,7 @@
           window.open('https://bio.site/wholesomety', '_blank');
         });
       }
+      
       playAgainButton.addEventListener('click', () => {
         gameOverScreen.classList.remove('show');
         startGame();
